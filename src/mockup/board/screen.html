@@ -1,0 +1,297 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>OpenBoard | Canvas Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&amp;family=Inter:wght@400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#3e0022",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface-bright": "#f9f9f9",
+                    "primary": "#000000",
+                    "on-primary-fixed-variant": "#474747",
+                    "inverse-primary": "#c6c6c6",
+                    "on-surface-variant": "#4c4546",
+                    "outline": "#7e7576",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#e2e2e2",
+                    "on-primary-fixed": "#1b1b1b",
+                    "on-tertiary-fixed": "#3e0022",
+                    "secondary": "#0058be",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-on-surface": "#f1f1f1",
+                    "secondary-fixed": "#d8e2ff",
+                    "surface-dim": "#dadada",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1b1b",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "background": "#f9f9f9",
+                    "on-background": "#1b1b1b",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-tint": "#5e5e5e",
+                    "surface-container": "#eeeeee",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#303030",
+                    "tertiary-fixed": "#ffd9e4",
+                    "primary-container": "#1b1b1b",
+                    "tertiary": "#000000",
+                    "surface": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#8c0053",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#004395",
+                    "on-primary-container": "#848484",
+                    "secondary-container": "#2170e4",
+                    "on-secondary-fixed": "#001a42",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#cfc4c5",
+                    "on-secondary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb0cd",
+                    "on-tertiary-container": "#e64394"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "shadow-offset": "8px",
+                    "border-width": "4px",
+                    "gutter": "24px",
+                    "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                    "label-md": ["Space Mono"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Montserrat"],
+                    "label-sm": ["Space Mono"],
+                    "display-lg": ["Montserrat"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "1.4", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+        }
+        .neobrutal-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+        }
+        .neobrutal-shadow-hover:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+        }
+        .neobrutal-shadow-active:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+        }
+        .canvas-grid {
+            background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .sketch-stroke {
+            stroke-dasharray: 5, 5;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-background w-full border-b-4 border-primary sticky top-0 flex justify-between items-center px-6 md:px-10 py-4 z-50">
+<div class="flex items-center gap-6">
+<a class="flex items-center gap-2 font-label-md text-label-md text-primary hover:underline decoration-4 underline-offset-8 transition-all" href="#">
+<span class="material-symbols-outlined">arrow_back</span>
+                Home
+            </a>
+<div class="h-8 w-1 bg-primary"></div>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg uppercase tracking-tighter">Untitled Board</h1>
+<button class="p-1 hover:bg-surface-container transition-colors border-2 border-transparent hover:border-primary active:translate-y-1">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-white border-4 border-primary px-6 py-2 font-label-md text-label-md neobrutal-shadow neobrutal-shadow-hover neobrutal-shadow-active transition-all">
+                Buka File
+            </button>
+<button class="bg-secondary-container text-on-secondary-container border-4 border-primary px-6 py-2 font-label-md text-label-md neobrutal-shadow neobrutal-shadow-hover neobrutal-shadow-active transition-all">
+                Simpan/Ekspor
+            </button>
+<div class="flex gap-2 ml-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform">dark_mode</span>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform">account_circle</span>
+</div>
+</div>
+</header>
+<main class="flex-grow relative overflow-hidden bg-white canvas-grid">
+<!-- SideNavBar (Tools Toolbar) -->
+<nav class="fixed left-8 top-1/2 -translate-y-1/2 w-20 flex flex-col p-2 z-40 bg-surface border-4 border-primary neobrutal-shadow">
+<div class="mb-4 text-center border-b-2 border-primary pb-2">
+<p class="font-label-sm text-[10px] uppercase text-primary/60">Tools</p>
+</div>
+<!-- Tool: Select (Active) -->
+<button class="bg-secondary-container text-on-secondary-container border-2 border-primary mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">near_me</span>
+<span class="font-label-md text-[10px] mt-1">Select</span>
+</button>
+<!-- Tool: Pan -->
+<button class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim hover:border-primary">
+<span class="material-symbols-outlined">pan_tool</span>
+<span class="font-label-md text-[10px] mt-1">Pan</span>
+</button>
+<!-- Tool: Pen -->
+<button class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim hover:border-primary">
+<span class="material-symbols-outlined">edit</span>
+<span class="font-label-md text-[10px] mt-1">Pen</span>
+</button>
+<!-- Tool: Shapes -->
+<button class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim hover:border-primary">
+<span class="material-symbols-outlined">category</span>
+<span class="font-label-md text-[10px] mt-1">Shapes</span>
+</button>
+<!-- Tool: Text -->
+<button class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim hover:border-primary">
+<span class="material-symbols-outlined">title</span>
+<span class="font-label-md text-[10px] mt-1">Text</span>
+</button>
+<!-- Tool: Note -->
+<button class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 transition-all hover:bg-secondary-fixed-dim hover:border-primary">
+<span class="material-symbols-outlined">sticky_note_2</span>
+<span class="font-label-md text-[10px] mt-1">Note</span>
+</button>
+</nav>
+<!-- Contextual Left Sidebar (Properties) -->
+<aside class="fixed left-32 top-1/2 -translate-y-1/2 w-48 bg-white border-4 border-primary p-4 z-40 neobrutal-shadow flex flex-col gap-6">
+<!-- Color Grid -->
+<div>
+<p class="font-label-md text-primary mb-3">Color</p>
+<div class="grid grid-cols-4 gap-2">
+<button class="w-6 h-6 bg-black border-2 border-primary"></button>
+<button class="w-6 h-6 bg-secondary-container border-2 border-primary"></button>
+<button class="w-6 h-6 bg-error border-2 border-primary"></button>
+<button class="w-6 h-6 bg-[#FFD700] border-2 border-primary ring-2 ring-primary ring-offset-2"></button>
+<button class="w-6 h-6 bg-[#4CAF50] border-2 border-primary"></button>
+<button class="w-6 h-6 bg-tertiary-fixed-dim border-2 border-primary"></button>
+<button class="w-6 h-6 bg-white border-2 border-primary"></button>
+<button class="w-6 h-6 bg-outline border-2 border-primary"></button>
+</div>
+</div>
+<!-- Stroke Weights -->
+<div>
+<p class="font-label-md text-primary mb-3">Stroke</p>
+<div class="flex flex-col gap-2">
+<button class="w-full h-2 border-b-2 border-primary"></button>
+<button class="w-full h-3 border-b-4 border-primary"></button>
+<button class="w-full h-4 border-b-8 border-primary"></button>
+</div>
+</div>
+<!-- Style Toggle -->
+<div>
+<p class="font-label-md text-primary mb-3">Style</p>
+<div class="flex border-4 border-primary">
+<button class="flex-1 py-2 font-label-sm text-[10px] uppercase bg-secondary-container text-on-secondary-container">Sketch</button>
+<button class="flex-1 py-2 font-label-sm text-[10px] uppercase bg-white hover:bg-surface-variant transition-colors">Vector</button>
+</div>
+</div>
+</aside>
+<!-- Canvas Area Content (Mockup) -->
+<div class="absolute inset-0 p-margin-desktop pointer-events-none">
+<!-- Sticky Note -->
+<div class="absolute left-[40%] top-[30%] w-64 h-64 bg-tertiary-fixed border-4 border-primary p-6 neobrutal-shadow rotate-2 pointer-events-auto cursor-grab active:cursor-grabbing">
+<p class="font-label-md text-primary">Meeting notes from brainstorming session: <br><br>1. Fix layout bugs<br>2. Improve shadow logic<br>3. Add more icons</p>
+</div>
+<!-- Drawn Circle with Text -->
+<div class="absolute left-[60%] top-[45%] pointer-events-auto">
+<svg class="drop-shadow-[6px_6px_0px_rgba(0,0,0,1)]" height="240" viewBox="0 0 240 240" width="240">
+<circle class="sketch-stroke" cx="120" cy="120" fill="none" r="110" stroke="black" stroke-width="6"></circle>
+<text class="uppercase" font-family="Montserrat" font-size="24" font-weight="900" text-anchor="middle" x="120" y="125">Idea Hub</text>
+</svg>
+</div>
+<!-- User Cursor Mockup -->
+<div class="absolute left-[52%] top-[55%] flex items-center gap-2 opacity-80 transition-all">
+<span class="material-symbols-outlined text-secondary transform -rotate-12" style="font-variation-settings: 'FILL' 1;">near_me</span>
+<span class="bg-secondary text-white font-label-sm px-2 py-1 rounded-sm border-2 border-primary text-[10px]">Sarah Drawing...</span>
+</div>
+</div>
+<!-- Zoom Controls -->
+<div class="fixed bottom-10 left-10 flex items-center bg-white border-4 border-primary neobrutal-shadow z-40">
+<button class="p-3 border-r-4 border-primary hover:bg-surface-variant active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="px-6 font-label-md text-label-md min-w-[80px] text-center">100%</div>
+<button class="p-3 border-l-4 border-primary hover:bg-surface-variant active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<!-- Bottom Actions (Help/Undo) -->
+<div class="fixed bottom-10 right-10 flex gap-4 z-40">
+<button class="bg-white border-4 border-primary p-3 neobrutal-shadow neobrutal-shadow-hover neobrutal-shadow-active transition-all">
+<span class="material-symbols-outlined">undo</span>
+</button>
+<button class="bg-white border-4 border-primary p-3 neobrutal-shadow neobrutal-shadow-hover neobrutal-shadow-active transition-all">
+<span class="material-symbols-outlined">redo</span>
+</button>
+<button class="bg-[#FFEB3B] border-4 border-primary p-3 neobrutal-shadow neobrutal-shadow-hover neobrutal-shadow-active transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-tertiary w-full border-t-4 border-primary mt-auto py-4 px-10 flex flex-col md:flex-row justify-between items-center z-50">
+<p class="font-label-sm text-label-sm text-on-tertiary/80 uppercase">© 2024 OpenBoard Neobrutalist Edition</p>
+<div class="flex gap-8 mt-4 md:mt-0">
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all uppercase" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all uppercase" href="#">Terms</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all uppercase" href="#">Discord</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all uppercase" href="#">Github</a>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for active state switching (mockup only)
+        document.querySelectorAll('nav button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('nav button').forEach(btn => {
+                    btn.classList.remove('bg-secondary-container', 'text-on-secondary-container', 'border-primary');
+                    btn.classList.add('bg-white', 'text-on-surface', 'border-transparent');
+                    btn.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
+                });
+                button.classList.remove('bg-white', 'text-on-surface', 'border-transparent');
+                button.classList.add('bg-secondary-container', 'text-on-secondary-container', 'border-primary');
+                button.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+            });
+        });
+
+        // Toggle Dark Mode Simulation
+        const darkModeToggle = document.querySelector('span[data-icon="dark_mode"]');
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        }
+    </script>
+</body></html>

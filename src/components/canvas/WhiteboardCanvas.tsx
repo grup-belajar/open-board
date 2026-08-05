@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store';
+import { useAppSelector } from '../../store/hooks';
 import { createRoughRenderer, drawFreehand } from '../../lib/roughEngine';
 
 export default function WhiteboardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const elements = useSelector((state: RootState) => state.canvas.elements);
+  const elements = useAppSelector((state) => state.canvas.elements);
   const [scale] = useState(1);
 
   useEffect(() => {

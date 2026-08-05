@@ -1,0 +1,294 @@
+<!DOCTYPE html><html class="light" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&amp;family=Inter:wght@400;500;600&amp;family=Space+Mono:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Montserrat:wght@100..900&amp;family=Space+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .neobrutal-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .neobrutal-shadow-lg {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+        }
+        .active-press:active {
+            transform: translate(8px, 8px);
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        }
+        .hover-pop:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#3e0022",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "primary": "#000000",
+                        "on-primary-fixed-variant": "#474747",
+                        "inverse-primary": "#c6c6c6",
+                        "on-surface-variant": "#4c4546",
+                        "outline": "#7e7576",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#1b1b1b",
+                        "on-tertiary-fixed": "#3e0022",
+                        "secondary": "#0058be",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "secondary-fixed": "#d8e2ff",
+                        "surface-dim": "#dadada",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1b1b1b",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "on-background": "#1b1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-tint": "#5e5e5e",
+                        "surface-container": "#eeeeee",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed": "#ffd9e4",
+                        "primary-container": "#1b1b1b",
+                        "tertiary": "#000000",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#8c0053",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-primary-container": "#848484",
+                        "secondary-container": "#2170e4",
+                        "on-secondary-fixed": "#001a42",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#cfc4c5",
+                        "on-secondary-container": "#fefcff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb0cd",
+                        "on-tertiary-container": "#e64394"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "shadow-offset": "8px",
+                        "border-width": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Space Mono"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "label-sm": ["Space Mono"],
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "1.4", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- Mock Background: Canvas Workspace -->
+<div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none select-none opacity-50">
+<!-- Dot Grid Pattern -->
+<div class="absolute inset-0" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 32px 32px;"></div>
+<!-- Mock Top Bar -->
+<header class="bg-background w-full border-b-4 border-primary px-margin-desktop py-4 flex justify-between items-center relative z-10">
+<h1 class="font-display-lg text-[24px] uppercase tracking-tighter text-primary">OpenBoard</h1>
+<div class="flex gap-4">
+<div class="w-10 h-10 border-4 border-primary bg-secondary-container"></div>
+<div class="w-10 h-10 border-4 border-primary bg-tertiary-fixed"></div>
+</div>
+</header>
+<!-- Mock Canvas Elements -->
+<div class="p-20 flex flex-wrap gap-12">
+<div class="w-64 h-64 border-4 border-primary bg-white neobrutal-shadow flex items-center justify-center p-6">
+<p class="font-label-md text-primary">BRAINSTORMING_SESSION_01</p>
+</div>
+<div class="w-96 h-48 border-4 border-primary bg-secondary-fixed neobrutal-shadow flex flex-col p-6">
+<div class="h-4 w-3/4 bg-primary mb-4"></div>
+<div class="h-4 w-1/2 bg-primary mb-4"></div>
+<div class="h-4 w-5/6 bg-primary"></div>
+</div>
+<div class="rounded-full w-40 h-40 border-4 border-primary bg-on-tertiary-container neobrutal-shadow flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-4xl">category</span>
+</div>
+</div>
+<!-- Mock Sidebar -->
+<div class="fixed left-8 top-1/2 -translate-y-1/2 w-20 border-4 border-primary bg-surface flex flex-col p-2 neobrutal-shadow">
+<div class="p-3 mb-2 bg-secondary-container border-2 border-primary flex items-center justify-center">
+<span class="material-symbols-outlined">near_me</span>
+</div>
+<div class="p-3 mb-2 border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined">edit</span>
+</div>
+<div class="p-3 mb-2 border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined">title</span>
+</div>
+<div class="p-3 mb-2 border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined">sticky_note_2</span>
+</div>
+</div>
+</div>
+<!-- MODAL OVERLAY -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[100] flex items-center justify-center p-4" id="modal-overlay">
+<!-- EXPORT MODAL -->
+<div class="bg-background w-full max-w-xl border-4 border-primary neobrutal-shadow-lg flex flex-col animate-in fade-in zoom-in duration-300">
+<!-- HEADER -->
+<div class="bg-on-tertiary-container p-6 border-b-4 border-primary flex justify-between items-center">
+<h2 class="font-headline-lg text-white">Ekspor &amp; Simpan Papan</h2>
+<button class="w-10 h-10 bg-white border-4 border-primary flex items-center justify-center hover-pop active-press transition-all" id="close-modal">
+<span class="material-symbols-outlined text-primary font-bold">close</span>
+</button>
+</div>
+<!-- CONTENT -->
+<div class="p-8 space-y-8">
+<!-- Export Format -->
+<section>
+<h3 class="font-label-md text-primary mb-4 uppercase tracking-wider">Format Ekspor</h3>
+<div class="grid grid-cols-3 gap-4">
+<label class="cursor-pointer group">
+<input checked="" class="hidden peer" name="format" type="radio" value="png">
+<div class="p-4 border-4 border-primary text-center font-bold bg-white peer-checked:bg-secondary-container peer-checked:text-white group-hover:bg-surface-container transition-colors">
+                                PNG
+                            </div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="format" type="radio" value="svg">
+<div class="p-4 border-4 border-primary text-center font-bold bg-white peer-checked:bg-secondary-container peer-checked:text-white group-hover:bg-surface-container transition-colors">
+                                SVG
+                            </div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="format" type="radio" value="json">
+<div class="p-4 border-4 border-primary text-center font-bold bg-white peer-checked:bg-secondary-container peer-checked:text-white group-hover:bg-surface-container transition-colors">
+                                JSON
+                            </div>
+</label>
+</div>
+</section>
+<!-- Options -->
+<section>
+<h3 class="font-label-md text-primary mb-4 uppercase tracking-wider">Opsi</h3>
+<div class="space-y-4">
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="relative">
+<input class="hidden peer" type="checkbox">
+<div class="w-8 h-8 border-4 border-primary bg-white peer-checked:bg-primary transition-all flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl scale-0 peer-checked:scale-100 transition-transform">check</span>
+</div>
+</div>
+<span class="font-body-lg text-primary">Latar Belakang Transparan</span>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="relative">
+<input class="hidden peer" type="checkbox">
+<div class="w-8 h-8 border-4 border-primary bg-white peer-checked:bg-primary transition-all flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl scale-0 peer-checked:scale-100 transition-transform">check</span>
+</div>
+</div>
+<span class="font-body-lg text-primary">Sertakan Hanya Elemen Terpilih</span>
+</label>
+</div>
+</section>
+<!-- Scale Buttons -->
+<section>
+<h3 class="font-label-md text-primary mb-4 uppercase tracking-wider">Skala Gambar</h3>
+<div class="flex gap-4">
+<button class="flex-1 py-3 border-4 border-primary bg-tertiary-fixed font-bold hover-pop active-press transition-all">
+                            1x
+                        </button>
+<button class="flex-1 py-3 border-4 border-primary bg-white font-bold hover-pop active-press transition-all">
+                            2x (HD)
+                        </button>
+<button class="flex-1 py-3 border-4 border-primary bg-white font-bold hover-pop active-press transition-all">
+                            3x
+                        </button>
+</div>
+</section>
+</div>
+<!-- FOOTER -->
+<div class="p-8 bg-surface-container border-t-4 border-primary flex flex-col md:flex-row gap-4 justify-end">
+<button class="px-8 py-4 border-4 border-primary bg-white font-label-md hover-pop active-press transition-all uppercase" id="cancel-btn">
+                    Batal
+                </button>
+<button class="px-8 py-4 border-4 border-primary bg-secondary-container text-white font-label-md hover-pop active-press transition-all uppercase flex items-center justify-center gap-2" id="download-btn">
+<span class="material-symbols-outlined">download</span>
+                    Download
+                </button>
+</div>
+</div>
+</div>
+<!-- UI Interactions Script -->
+<script>
+        // Modal Close Logic
+        const overlay = document.getElementById('modal-overlay');
+        const closeBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        const closeModal = () => {
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            overlay.querySelector('div').classList.add('scale-95');
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        downloadBtn.addEventListener('click', () => {
+            downloadBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Memproses...';
+            setTimeout(() => {
+                downloadBtn.innerHTML = '<span class="material-symbols-outlined">check</span> Selesai!';
+                setTimeout(closeModal, 1000);
+            }, 1500);
+        });
+
+        // Scale Button Logic
+        const scaleButtons = document.querySelectorAll('section:last-of-type button');
+        scaleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                scaleButtons.forEach(b => {
+                    b.classList.remove('bg-tertiary-fixed');
+                    b.classList.add('bg-white');
+                });
+                btn.classList.add('bg-tertiary-fixed');
+                btn.classList.remove('bg-white');
+            });
+        });
+
+        // Format Radio Logic (Visual feedback)
+        const formatRadios = document.querySelectorAll('input[name="format"]');
+        formatRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                console.log('Format selected:', e.target.value);
+            });
+        });
+    </script>
+</body></html>

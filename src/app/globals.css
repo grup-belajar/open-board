@@ -1,1 +1,55 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-accent-blue: #3b82f6;
+  --color-accent-pink: #ec4899;
+  --color-accent-yellow: #eab308;
+  --color-surface: #f9f9f9;
+  --color-surface-2: #f3f4f6;
+  --color-surface-3: #eeeeee;
+  --color-surface-4: #e8e8e8;
+  --color-background: #f9f9f9;
+  --color-on-surface: #1b1b1b;
+  --color-on-surface-variant: #4c4546;
+  --color-secondary: #0058be;
+
+  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  --text-display: 48px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+
+  --text-headline: 32px;
+  --text-headline--line-height: 1.2;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+
+  --text-label: 14px;
+  --text-label--line-height: 1.4;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1.2;
+
+  --shadow-hard: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-hard-lg: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.neobrutal-button {
+  transition: all 150ms ease;
+}
+.neobrutal-button:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-hard-lg);
+}
+.neobrutal-button:active {
+  transform: translate(8px, 8px);
+  box-shadow: none;
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/hooks';
 import { setActiveTool } from '../../store/slices/toolSlice';
 import { MousePointer, Hand, Pen, Square, Circle, Type, StickyNote, Eraser } from 'lucide-react';
 import type { ToolType } from '../../store/slices/toolSlice';
@@ -18,7 +18,7 @@ const TOOLS: { type: ToolType; icon: typeof Pen }[] = [
 ];
 
 export default function Toolbar() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [active, setActive] = useState<ToolType>('select');
 
   const handleClick = (type: ToolType) => {

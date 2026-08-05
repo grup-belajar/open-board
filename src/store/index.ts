@@ -9,9 +9,7 @@ export const store = configureStore({
     tool: toolReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }).concat(indexedDbSyncMiddleware),
+    getDefaultMiddleware().concat(indexedDbSyncMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,0 +1,301 @@
+<!DOCTYPE html><html class="light" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&amp;family=Inter:wght@400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neobrutal-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .neobrutal-shadow-lg {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+        }
+        .active-sink:active {
+            transform: translate(8px, 8px);
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+        }
+        .hover-pop:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#3e0022",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "primary": "#000000",
+                        "on-primary-fixed-variant": "#474747",
+                        "inverse-primary": "#c6c6c6",
+                        "on-surface-variant": "#4c4546",
+                        "outline": "#7e7576",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#1b1b1b",
+                        "on-tertiary-fixed": "#3e0022",
+                        "secondary": "#0058be",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "secondary-fixed": "#d8e2ff",
+                        "surface-dim": "#dadada",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1b1b1b",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "background": "#f9f9f9",
+                        "on-background": "#1b1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-tint": "#5e5e5e",
+                        "surface-container": "#eeeeee",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed": "#ffd9e4",
+                        "primary-container": "#1b1b1b",
+                        "tertiary": "#000000",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#8c0053",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-primary-container": "#848484",
+                        "secondary-container": "#2170e4",
+                        "on-secondary-fixed": "#001a42",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#cfc4c5",
+                        "on-secondary-container": "#fefcff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb0cd",
+                        "on-tertiary-container": "#e64394"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "shadow-offset": "8px",
+                        "border-width": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Space Mono"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "label-sm": ["Space Mono"],
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "1.4", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="w-full border-b-4 border-primary sticky top-0 bg-background z-50 flex justify-between items-center px-6 md:px-margin-desktop py-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<div class="flex items-center gap-4">
+<h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg uppercase tracking-tighter text-primary">OpenBoard</h1>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-secondary font-bold underline underline-offset-4 font-label-md text-label-md" href="#">Home</a>
+<a class="text-on-surface hover:text-secondary font-label-md text-label-md transition-colors" href="#">Explore</a>
+<div class="flex gap-4 ml-4">
+<button class="material-symbols-outlined p-2 border-2 border-primary bg-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">dark_mode</button>
+<button class="material-symbols-outlined p-2 border-2 border-primary bg-white hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">account_circle</button>
+<button class="bg-secondary-container text-on-secondary-container border-4 border-primary px-6 py-2 font-label-md text-label-md hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">New Board</button>
+</div>
+</nav>
+<button class="md:hidden material-symbols-outlined text-4xl">menu</button>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="relative py-20 px-6 md:px-margin-desktop overflow-hidden border-b-4 border-primary">
+<div class="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center">
+<div class="bg-secondary text-on-secondary font-label-md px-4 py-1 mb-6 border-2 border-primary transform -rotate-2">
+                    BETA 1.0 AVAILABLE NOW
+                </div>
+<h2 class="font-display-lg text-4xl md:text-7xl mb-6 uppercase tracking-tight">Papan Tulis Digital Bebas</h2>
+<p class="font-body-lg text-body-lg md:text-2xl mb-12 max-w-2xl bg-white/80 border-2 border-primary p-4 inline-block">Coret-coret ide, buat diagram, gratis! Tanpa login, langsung eksekusi.</p>
+<div class="flex flex-col md:flex-row gap-8 w-full justify-center">
+<button class="bg-secondary-container text-on-secondary-container border-4 border-primary px-10 py-6 text-xl md:text-2xl font-display-lg uppercase flex items-center justify-center gap-3 hover-pop active-sink transition-all neobrutal-shadow">
+<span class="material-symbols-outlined text-3xl">add_circle</span>
+                        + Buat Papan Baru
+                    </button>
+<button class="bg-white text-primary border-4 border-primary px-10 py-6 text-xl md:text-2xl font-display-lg uppercase flex items-center justify-center gap-3 hover-pop active-sink transition-all neobrutal-shadow">
+<span class="material-symbols-outlined text-3xl">folder_open</span>
+                        📂 Buka File JSON
+                    </button>
+</div>
+</div>
+<!-- Atmospheric Decorative Elements -->
+<div class="absolute top-10 right-10 opacity-20 hidden md:block">
+<span class="material-symbols-outlined text-9xl">gesture</span>
+</div>
+<div class="absolute bottom-10 left-10 opacity-20 hidden md:block">
+<span class="material-symbols-outlined text-9xl">polyline</span>
+</div>
+</section>
+<!-- Boards Section -->
+<section class="py-20 px-6 md:px-margin-desktop bg-surface-container-low">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div>
+<h3 class="font-display-lg text-3xl md:text-5xl uppercase mb-2">Papan Terakhir Kamu</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">(Tersimpan Lokal di Browser)</p>
+</div>
+<button class="border-4 border-primary bg-tertiary-fixed text-primary px-6 py-3 font-label-md text-label-md hover-pop active-sink neobrutal-shadow flex items-center gap-2">
+<span class="material-symbols-outlined">delete_sweep</span>
+                        Bersihkan Semua
+                    </button>
+</div>
+<!-- Bento Grid for Boards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+<!-- Board Card 1 -->
+<div class="group bg-white border-4 border-primary p-4 hover-pop active-sink transition-all neobrutal-shadow relative">
+<div class="absolute -top-4 -right-4 bg-tertiary-fixed-dim text-primary border-2 border-primary font-label-sm px-3 py-1 z-20 transform rotate-6">
+                            DIAGRAM
+                        </div>
+<div class="w-full h-48 bg-surface-container-high border-2 border-primary mb-4 overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform" data-alt="A high-contrast digital wireframe of a mobile application system architecture displayed on a white background with thick black strokes and neon blue highlights, reflecting a clean neobrutalist design aesthetic for a creative brainstorming session." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEevci4CfNZgYpLl--EzrVlRTC_eW_w9dj8MJuAkO--EkYmSgPCU1z-GSRCEudpHsba72cXTIeCWTy1iOjZ3dUHygaxMNGi-nPxgPyWGfR93QZ81yeHedNkNc-SxeQlGlcyV_kkPIE5QWJPIDGe4hNrHii5DfsRAJcN3VFm_a1OW8vT4CNAXNzRT5CuZxnilh9SVS4N4HMQRAzXgCAaT8FEn3MT_3YvOIKQa4zsNRTvvP21zOHPyKs')"></div>
+</div>
+<h4 class="font-headline-lg text-xl mb-1">Diagram Sistem</h4>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                Edit: 2 hours ago
+                            </span>
+<div class="flex gap-2">
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-secondary-fixed">edit</button>
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-error-container text-error">delete</button>
+</div>
+</div>
+</div>
+<!-- Board Card 2 -->
+<div class="group bg-white border-4 border-primary p-4 hover-pop active-sink transition-all neobrutal-shadow relative">
+<div class="absolute -top-4 -right-4 bg-secondary-fixed text-primary border-2 border-primary font-label-sm px-3 py-1 z-20 transform -rotate-3">
+                            MINDMAP
+                        </div>
+<div class="w-full h-48 bg-surface-container-high border-2 border-primary mb-4 overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform" data-alt="A vibrant digital mindmap centered on product strategy with colorful branching paths and bold handwritten-style typography. The visual uses a high-key light background with thick black borders and primary color accents like sunny yellow and electric blue, maintaining a professional yet playful brutalist vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC4rAPC8RMfHDCDyVJNpUVHi5rNfHTB0dA-Ns0aXklKjx8R2OzDvh-JfaH0hO-oJDbDn3j9sFqVGNEjvI5RWAq5_GxmSNybtkvGIO7rt9TguUS9ZgFxOmrq5N12b2a67bsmF2IGvUlpdngBOEQtr6pE5mRkGTYOqQjg73Mbn-YI4bd2aKazmV8i9zdrvo7rjVxoQt8kE7GoBBLhmZqYGovH05WLzM-Caeq-ru6ZwxvKDd5b8GGqAJzG')"></div>
+</div>
+<h4 class="font-headline-lg text-xl mb-1">Mindmap Produk</h4>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                Edit: 5 hours ago
+                            </span>
+<div class="flex gap-2">
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-secondary-fixed">edit</button>
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-error-container text-error">delete</button>
+</div>
+</div>
+</div>
+<!-- Board Card 3 -->
+<div class="group bg-white border-4 border-primary p-4 hover-pop active-sink transition-all neobrutal-shadow relative">
+<div class="w-full h-48 bg-surface-container-high border-2 border-primary mb-4 overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform" data-alt="A digital sketchbook page showing rough concept sketches for a futuristic user interface, using heavy charcoal brush strokes and bright pink highlight circles. The background is a crisp white canvas with a subtle grid pattern, emphasizing a raw, unfinished but high-impact neobrutalist artistic style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDQwEyjxKluzXBQgOesrNXupjdFuTAkwhlsHeKLG7ULsuzayHIjnyrqJR4nlnAn9h1eaj-fMhhl--puTir97Jps66WD1lLnKjQXDshYGROr2wxVK2iiyvQfmJoRoB0j8yQYA9_xCwfeqUHg3fUl2nVeghc94CjouUPwuLXw8eJaqFGazfjl2QNnEbjM9WaDofDs5YuBoTncL37UIea0h5g5RGZnDGrKSNukKxjYccpy9pmwqH4NuNEv')"></div>
+</div>
+<h4 class="font-headline-lg text-xl mb-1">Sketsa Ide UI</h4>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                Edit: 12 hours ago
+                            </span>
+<div class="flex gap-2">
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-secondary-fixed">edit</button>
+<button class="material-symbols-outlined border-2 border-primary p-1 hover:bg-error-container text-error">delete</button>
+</div>
+</div>
+</div>
+<!-- New Board Placeholder -->
+<button class="bg-surface border-4 border-primary border-dashed p-4 flex flex-col items-center justify-center min-h-[300px] hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-6xl mb-4 group-hover:scale-110 transition-transform">add_box</span>
+<p class="font-display-lg text-xl uppercase">Mulai Papan Baru</p>
+</button>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="bg-primary text-on-primary py-24 px-6 text-center border-y-4 border-white">
+<h2 class="font-display-lg text-4xl md:text-6xl mb-8 uppercase tracking-tighter">Bawa ide anda ke level selanjutnya</h2>
+<p class="font-body-lg text-xl mb-12 max-w-2xl mx-auto opacity-80">OpenBoard adalah alat open-source gratis untuk kolaborasi visual cepat. Tanpa akun, tanpa biaya tersembunyi.</p>
+<div class="flex flex-wrap justify-center gap-6">
+<button class="bg-white text-primary px-8 py-4 border-4 border-white font-display-lg uppercase hover:bg-transparent hover:text-white transition-all">Kontribusi di GitHub</button>
+<button class="bg-secondary text-on-secondary px-8 py-4 border-4 border-secondary font-display-lg uppercase hover:bg-white hover:text-secondary transition-all">Join Community</button>
+</div>
+</section>
+</main>
+<!-- SideNavBar (Only visible for certain states, here shown as tools preview) -->
+<aside class="fixed left-8 top-1/2 -translate-y-1/2 w-20 rounded-none border-4 border-primary bg-surface p-2 z-40 hidden xl:flex flex-col neobrutal-shadow">
+<div class="bg-secondary-container text-on-secondary-container border-2 border-primary mb-2 flex flex-col items-center p-3">
+<span class="material-symbols-outlined">near_me</span>
+<span class="font-label-md text-[10px] mt-1">Select</span>
+</div>
+<div class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 hover:bg-secondary-fixed-dim transition-colors cursor-pointer">
+<span class="material-symbols-outlined">pan_tool</span>
+<span class="font-label-md text-[10px] mt-1">Pan</span>
+</div>
+<div class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 hover:bg-secondary-fixed-dim transition-colors cursor-pointer">
+<span class="material-symbols-outlined">edit</span>
+<span class="font-label-md text-[10px] mt-1">Pen</span>
+</div>
+<div class="bg-white text-on-surface border-2 border-transparent mb-2 flex flex-col items-center p-3 hover:bg-secondary-fixed-dim transition-colors cursor-pointer">
+<span class="material-symbols-outlined">category</span>
+<span class="font-label-md text-[10px] mt-1">Shapes</span>
+</div>
+</aside>
+<!-- Footer -->
+<footer class="w-full border-t-4 border-primary mt-auto bg-tertiary">
+<div class="flex flex-col md:flex-row justify-between items-center px-6 md:px-margin-desktop py-8 w-full gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-tertiary uppercase">OpenBoard</h2>
+<p class="font-label-sm text-label-sm text-on-tertiary/60">© 2024 OpenBoard Neobrutalist Edition</p>
+</div>
+<div class="flex flex-wrap gap-8">
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all" href="#">Terms</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all" href="#">Discord</a>
+<a class="font-label-sm text-label-sm text-on-tertiary/80 hover:text-secondary-fixed transition-all" href="#">Github</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and subtle effects
+        document.querySelectorAll('.hover-pop').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                // Potential for adding small particle effects or sound
+            });
+        });
+
+        // Theme toggle logic (placeholder)
+        const themeToggle = document.querySelector('button.material-symbols-outlined');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            themeToggle.innerText = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+        });
+    </script>
+</body></html>
