@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { pushHistory, setSelectedElementIds, updateElements } from '../store/slices/canvasSlice';
+import { commitHistory, setElements, setSelectedElementIds } from '../store/slices/canvasSlice';
 import type { CanvasElement } from '../store/slices/canvasSlice';
 import type { Matrix2D } from '../lib/matrixMath';
 import { screenToWorld, worldToScreen } from '../lib/matrixMath';
@@ -141,7 +141,7 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         }
         return { ...el, x: el.x + dx, y: el.y + dy };
       });
-      dispatch(updateElements(moved));
+      dispatch(setElements(moved));
       redraw();
       return;
     }
@@ -201,7 +201,7 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         };
       });
 
-      dispatch(updateElements(resized));
+      dispatch(setElements(resized));
       redraw();
       return;
     }
@@ -209,10 +209,14 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
 
   const onPointerUp = useCallback(() => {
     if (stateRef.current.mode !== 'idle') {
-      dispatch(pushHistory());
+      dispatch(commitHistory());
     }
     stateRef.current = { mode: 'idle', startWorld: { x: 0, y: 0 }, originals: [] };
   }, [dispatch]);
+
+  const resetInteraction = useCallback(() => {
+    stateRef.current = { mode: 'idle', startWorld: { x: 0, y: 0 }, originals: [] };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -220,10 +224,12 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', resetInteraction);
     return () => {
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', resetInteraction);
     };
-  }, [canvasRef, onPointerDown, onPointerMove, onPointerUp]);
+  }, [canvasRef, onPointerDown, onPointerMove, onPointerUp, resetInteraction]);
 }

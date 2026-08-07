@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface CanvasElement {
   id: string;
@@ -31,14 +32,32 @@ interface CanvasState {
 
 const MAX_HISTORY = 100;
 
+function cloneElements(elements: CanvasElement[]): CanvasElement[] {
+  return elements.map((el) => ({
+    ...el,
+    points: el.points ? el.points.map((p) => ({ ...p })) : undefined,
+  }));
+}
+
 const initialState: CanvasState = {
   elements: [],
   selectedElementIds: [],
   panOffset: { x: 0, y: 0 },
   zoomLevel: 1,
-  history: [],
-  historyIndex: -1,
+  history: [[]],
+  historyIndex: 0,
 };
+
+function commitSnapshot(state: CanvasState, nextElements: CanvasElement[]) {
+  if (JSON.stringify(state.elements) === JSON.stringify(nextElements)) return;
+  state.history = state.history.slice(0, state.historyIndex + 1);
+  state.history.push(cloneElements(nextElements));
+  if (state.history.length > MAX_HISTORY) {
+    state.history.shift();
+  }
+  state.historyIndex = state.history.length - 1;
+  state.elements = nextElements;
+}
 
 export const canvasSlice = createSlice({
   name: 'canvas',
@@ -48,20 +67,23 @@ export const canvasSlice = createSlice({
       state.elements = action.payload;
     },
     addElement: (state, action: PayloadAction<CanvasElement>) => {
-      state.elements.push(action.payload);
+      commitSnapshot(state, [...state.elements, action.payload]);
     },
     updateElement: (state, action: PayloadAction<CanvasElement>) => {
       const index = state.elements.findIndex(el => el.id === action.payload.id);
-      if (index !== -1) {
-        state.elements[index] = action.payload;
-      }
+      if (index === -1) return;
+      const next = [...state.elements];
+      next[index] = action.payload;
+      commitSnapshot(state, next);
     },
     updateElements: (state, action: PayloadAction<CanvasElement[]>) => {
       const byId = new Map(action.payload.map(el => [el.id, el]));
-      state.elements = state.elements.map(el => byId.get(el.id) ?? el);
+      const next = state.elements.map(el => byId.get(el.id) ?? el);
+      commitSnapshot(state, next);
     },
     deleteElement: (state, action: PayloadAction<string>) => {
-      state.elements = state.elements.filter(el => el.id !== action.payload);
+      const next = state.elements.filter(el => el.id !== action.payload);
+      commitSnapshot(state, next);
       state.selectedElementIds = state.selectedElementIds.filter(id => id !== action.payload);
     },
     setSelectedElementIds: (state, action: PayloadAction<string[]>) => {
@@ -71,29 +93,27 @@ export const canvasSlice = createSlice({
       state.panOffset = action.payload.panOffset;
       state.zoomLevel = action.payload.zoomLevel;
     },
-    pushHistory: (state) => {
-      const snapshot = state.elements.map(el => ({ ...el }));
-      const trimmed = state.history.slice(0, state.historyIndex + 1);
-      trimmed.push(snapshot);
-      if (trimmed.length > MAX_HISTORY) {
-        trimmed.shift();
+    commitHistory: (state) => {
+      const snapshot = cloneElements(state.elements);
+      const top = state.history[state.historyIndex];
+      if (top && JSON.stringify(snapshot) === JSON.stringify(top)) return;
+      state.history = state.history.slice(0, state.historyIndex + 1);
+      state.history.push(snapshot);
+      if (state.history.length > MAX_HISTORY) {
+        state.history.shift();
       }
-      state.history = trimmed;
-      state.historyIndex = trimmed.length - 1;
+      state.historyIndex = state.history.length - 1;
     },
     undo: (state) => {
-      if (state.historyIndex < 0) return;
+      if (state.historyIndex <= 0) return;
       state.historyIndex -= 1;
-      state.elements =
-        state.historyIndex >= 0
-          ? state.history[state.historyIndex].map(el => ({ ...el }))
-          : [];
+      state.elements = cloneElements(state.history[state.historyIndex]);
       state.selectedElementIds = [];
     },
     redo: (state) => {
       if (state.historyIndex >= state.history.length - 1) return;
       state.historyIndex += 1;
-      state.elements = state.history[state.historyIndex].map(el => ({ ...el }));
+      state.elements = cloneElements(state.history[state.historyIndex]);
       state.selectedElementIds = [];
     },
   },
@@ -107,7 +127,7 @@ export const {
   deleteElement,
   setSelectedElementIds,
   setPanZoom,
-  pushHistory,
+  commitHistory,
   undo,
   redo,
 } = canvasSlice.actions;
