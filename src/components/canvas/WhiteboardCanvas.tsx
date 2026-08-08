@@ -32,22 +32,6 @@ export default function WhiteboardCanvas() {
   const selectionRef = useRef(selectedElementIds);
   const activeToolRef = useRef(activeTool);
 
-  useEffect(() => {
-    elementsRef.current = elements;
-  }, [elements]);
-
-  useEffect(() => {
-    selectionRef.current = selectedElementIds;
-  }, [selectedElementIds]);
-
-  useEffect(() => {
-    activeToolRef.current = activeTool;
-  }, [activeTool]);
-
-  useEffect(() => {
-    matrixRef.current = getMatrixFromState(panOffset, zoomLevel);
-  }, [panOffset, zoomLevel]);
-
   const syncViewport = useCallback(() => {
     const m = matrixRef.current;
     dispatch(setPanZoom({ panOffset: { x: m.e, y: m.f }, zoomLevel: m.a }));
@@ -79,6 +63,24 @@ export default function WhiteboardCanvas() {
 
     drawSelectionOverlay(ctx, elementsRef.current, selectionRef.current, m, dpr);
   }, []);
+
+  useEffect(() => {
+    elementsRef.current = elements;
+    draw();
+  }, [elements, draw]);
+
+  useEffect(() => {
+    selectionRef.current = selectedElementIds;
+    draw();
+  }, [selectedElementIds, draw]);
+
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+  }, [activeTool]);
+
+  useEffect(() => {
+    matrixRef.current = getMatrixFromState(panOffset, zoomLevel);
+  }, [panOffset, zoomLevel]);
 
   const getCanvasPoint = useCallback((clientX: number, clientY: number) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -216,17 +218,20 @@ export default function WhiteboardCanvas() {
   });
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="h-full w-full"
-      style={{
-        backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
-        backgroundSize: '24px 24px',
-        backgroundPosition: '0 0',
-        backgroundAttachment: 'local ',
-      }}
-      data-testid="whiteboard-canvas"
-    />
+    <div ref={containerRef} className="h-full w-full">
+      <canvas
+        ref={canvasRef}
+        className="h-full w-full"
+        style={{
+          touchAction: 'none',
+          backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
+          backgroundSize: '24px 24px',
+          backgroundPosition: '0 0',
+          backgroundAttachment: 'local ',
+        }}
+        data-testid="whiteboard-canvas"
+      />
+    </div>
   );
 }
 
