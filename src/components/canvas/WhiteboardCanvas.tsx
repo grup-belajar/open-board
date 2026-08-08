@@ -6,8 +6,10 @@ import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
 import { getMatrixFromState, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
 import { getElementBounds, mergeBounds } from '../../lib/geometry';
+import type { CanvasElement } from '../../store/slices/canvasSlice';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
+import useDrawingEngine from '../../hooks/useDrawingEngine';
 
 export default function WhiteboardCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,15 +19,18 @@ export default function WhiteboardCanvas() {
   const matrixRef = useRef<Matrix2D>(getMatrixFromState({ x: 0, y: 0 }, 1));
   const spaceRef = useRef(false);
   const panState = useRef({ active: false, startX: 0, startY: 0 });
+  const draftRef = useRef<CanvasElement | null>(null);
 
   const dispatch = useAppDispatch();
   const elements = useAppSelector((state) => state.canvas.elements);
   const selectedElementIds = useAppSelector((state) => state.canvas.selectedElementIds);
   const panOffset = useAppSelector((state) => state.canvas.panOffset);
   const zoomLevel = useAppSelector((state) => state.canvas.zoomLevel);
+  const activeTool = useAppSelector((state) => state.tool.activeTool);
 
   const elementsRef = useRef(elements);
   const selectionRef = useRef(selectedElementIds);
+  const activeToolRef = useRef(activeTool);
 
   useEffect(() => {
     elementsRef.current = elements;
@@ -34,6 +39,10 @@ export default function WhiteboardCanvas() {
   useEffect(() => {
     selectionRef.current = selectedElementIds;
   }, [selectedElementIds]);
+
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+  }, [activeTool]);
 
   useEffect(() => {
     matrixRef.current = getMatrixFromState(panOffset, zoomLevel);
@@ -62,8 +71,11 @@ export default function WhiteboardCanvas() {
     );
 
     for (const el of elementsRef.current) {
-      drawElement(rough, el);
+      drawElement(rough, ctx, el);
     }
+
+    const draft = draftRef.current;
+    if (draft) drawElement(rough, ctx, draft);
 
     drawSelectionOverlay(ctx, elementsRef.current, selectionRef.current, m, dpr);
   }, []);
@@ -76,7 +88,9 @@ export default function WhiteboardCanvas() {
   const getMatrix = useCallback(() => matrixRef.current, []);
 
   const isPanGesture = useCallback(
-    (event: PointerEvent) => event.button === 1 || (event.button === 0 && spaceRef.current),
+    (event: PointerEvent) =>
+      event.button === 1 ||
+      (event.button === 0 && (spaceRef.current || activeToolRef.current === 'pan')),
     []
   );
 
@@ -177,11 +191,28 @@ export default function WhiteboardCanvas() {
     };
   }, [draw, getCanvasPoint, syncViewport]);
 
+  useDrawingEngine({
+    canvasRef,
+    draftRef,
+    getMatrix,
+    redraw: draw,
+    isPanGesture,
+  });
+
+  const selectionEnabled =
+    activeTool !== 'pen' &&
+    activeTool !== 'rectangle' &&
+    activeTool !== 'ellipse' &&
+    activeTool !== 'line' &&
+    activeTool !== 'eraser' &&
+    activeTool !== 'pan';
+
   useSelectionEngine({
     canvasRef,
     getMatrix,
     redraw: draw,
     isPanGesture,
+    enabled: selectionEnabled,
   });
 
   return (

@@ -2,11 +2,16 @@
 import { MouseEvent, useState } from "react"
 import { configSidebarTools } from "../config/configSibarTools"
 import PropertyColors from "../properties/ProperyColors"
+import { useAppDispatch } from "../../store/hooks"
+import { setActiveTool } from "../../store/slices/toolSlice"
 
 function SudidebrColors() {
     const [propertiColor, setPropertiColors] = useState<boolean>(false);
     const [active, seActive] = useState<number>(0)
+    const dispatch = useAppDispatch();
     const handleClick = (event: MouseEvent<HTMLButtonElement>, id: number) => {
+        const item = configSidebarTools.find((tool) => tool.id === id);
+        if (item) dispatch(setActiveTool(item.tool));
         if (id === 3) {
             setPropertiColors(prev => !prev)
         }
