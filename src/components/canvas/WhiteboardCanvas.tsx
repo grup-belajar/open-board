@@ -8,7 +8,6 @@ export default function WhiteboardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const elements = useAppSelector((state) => state.canvas.elements);
   const [scale] = useState(1);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -31,7 +30,13 @@ export default function WhiteboardCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="h-full w-full"
+      className='h-screen w-full'
+      style={{
+        backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
+        backgroundSize: '24px 24px',
+        backgroundPosition: '0 0',
+        backgroundAttachment: 'local ',
+      }}
       data-testid="whiteboard-canvas"
     />
   );
