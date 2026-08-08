@@ -2,7 +2,7 @@
 
 export default function PropertyColors() {
     return (
-        <div className="bg-white absolute top-50 left-32 md:left-28 border-4 border-black w-52 z-999 shadow-hard-lg">
+        <div className="absolute left-full top-1/2 ml-3 -translate-y-1/2 z-50 bg-white border-4 border-primary w-52 shadow-hard-lg">
             <div className="flex flex-col px-2 py-4 space-y-2">
                 <h2 className="font-body text-md">Color</h2>
                 <div className="grid grid-cols-4 py-2 px-1 space-y-2">
