@@ -7,10 +7,24 @@ export interface Matrix2D {
   f: number;
 }
 
+export const MIN_ZOOM = 0.1;
+export const MAX_ZOOM = 30;
+
 export const IDENTITY_MATRIX: Matrix2D = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 
 export function createMatrix(scale: number, tx: number, ty: number): Matrix2D {
   return { a: scale, b: 0, c: 0, d: scale, e: tx, f: ty };
+}
+
+export function getMatrixFromState(
+  panOffset: { x: number; y: number },
+  zoomLevel: number
+): Matrix2D {
+  return createMatrix(zoomLevel, panOffset.x, panOffset.y);
+}
+
+export function clampZoom(value: number): number {
+  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }
 
 export function screenToWorld(
@@ -32,5 +46,24 @@ export function worldToScreen(
   return {
     x: wx * matrix.a + matrix.e,
     y: wy * matrix.d + matrix.f,
+  };
+}
+
+export function zoomAtPoint(
+  matrix: Matrix2D,
+  factor: number,
+  cx: number,
+  cy: number
+): Matrix2D {
+  const { x: worldX, y: worldY } = screenToWorld(cx, cy, matrix);
+  const newScale = clampZoom(matrix.a * factor);
+
+  return {
+    a: newScale,
+    b: 0,
+    c: 0,
+    d: newScale,
+    e: cx - worldX * newScale,
+    f: cy - worldY * newScale,
   };
 }
