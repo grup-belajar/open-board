@@ -105,6 +105,7 @@ export function drawElement(
 }
 
 function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
+  ctx.save();
   const fontSize = Math.max(12, el.strokeWidth * 6);
   ctx.font = `${fontSize}px Inter, sans-serif`;
   ctx.fillStyle = el.strokeColor;
@@ -112,9 +113,11 @@ function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
   (el.text ?? '').split('\n').forEach((line, i) => {
     ctx.fillText(line, el.x, el.y + i * (fontSize + 4));
   });
+  ctx.restore();
 }
 
 function drawSticky(roughCanvas: RoughCanvas, ctx: CanvasRenderingContext2D, el: CanvasElement): void {
+  ctx.save();
   const width = el.width ?? 160;
   const height = el.height ?? 120;
 
@@ -134,4 +137,5 @@ function drawSticky(roughCanvas: RoughCanvas, ctx: CanvasRenderingContext2D, el:
   (el.text ?? '').split('\n').forEach((line, i) => {
     ctx.fillText(line, el.x + 8, el.y + 8 + i * 18);
   });
+  ctx.restore();
 }

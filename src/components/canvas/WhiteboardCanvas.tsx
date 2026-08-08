@@ -254,6 +254,7 @@ function drawSelectionOverlay(
   const w = br.x - tl.x;
   const h = br.y - tl.y;
 
+  ctx.save();
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.strokeStyle = '#3b82f6';
   ctx.lineWidth = 2;
@@ -271,4 +272,5 @@ function drawSelectionOverlay(
   ]) {
     ctx.fillRect(hx - size / 2, hy - size / 2, size, size);
   }
+  ctx.restore();
 }

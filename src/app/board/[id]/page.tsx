@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import Navbar from '../../../components/ui/Navbar';
 import WhiteboardCanvas from '../../../components/canvas/WhiteboardCanvas';
 import ButtonZoom from '../../../components/ui/button/ButtonZoom';
-import SudidebrColors from '../../../components/ui/Sidebar';
+import Sidebar from '../../../components/ui/Sidebar';
 import { useAppDispatch } from '../../../store/hooks';
 import { setActiveTool, type ToolType } from '../../../store/slices/toolSlice';
 
@@ -38,7 +38,7 @@ export default function BoardPage() {
       <Navbar />
       <div className="relative flex-1">
         <WhiteboardCanvas />
-        <SudidebrColors />
+        <Sidebar />
       </div>
       <ButtonZoom />
     </div>
