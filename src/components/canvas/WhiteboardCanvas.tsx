@@ -188,6 +188,12 @@ export default function WhiteboardCanvas() {
     <canvas
       ref={canvasRef}
       className="h-full w-full"
+      style={{
+        backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
+        backgroundSize: '24px 24px',
+        backgroundPosition: '0 0',
+        backgroundAttachment: 'local ',
+      }}
       data-testid="whiteboard-canvas"
     />
   );
