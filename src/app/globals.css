@@ -6,6 +6,9 @@
   --color-accent-blue: #3b82f6;
   --color-accent-pink: #ec4899;
   --color-accent-yellow: #eab308;
+  --color-accent-red: #E63946;
+  --color-accent-green: #266210;
+  --color-accent-peach: #FFBDA3;
   --color-surface: #f9f9f9;
   --color-surface-2: #f3f4f6;
   --color-surface-3: #eeeeee;
@@ -45,10 +48,12 @@
 .neobrutal-button {
   transition: all 150ms ease;
 }
+
 .neobrutal-button:hover {
   transform: translate(-4px, -4px);
   box-shadow: var(--shadow-hard-lg);
 }
+
 .neobrutal-button:active {
   transform: translate(8px, 8px);
   box-shadow: none;
