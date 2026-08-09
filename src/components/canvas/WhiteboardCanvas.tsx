@@ -6,6 +6,7 @@ import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
 import { getMatrixFromState, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
 import { getElementBounds, mergeBounds } from '../../lib/geometry';
+import { getVisibleElements } from '../../lib/viewportCulling';
 import type { CanvasElement } from '../../store/slices/canvasSlice';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
@@ -54,7 +55,13 @@ export default function WhiteboardCanvas() {
       canvas.height / (dpr * m.d)
     );
 
-    for (const el of elementsRef.current) {
+    const visibleElements = getVisibleElements(
+      elementsRef.current,
+      { width: canvas.width / dpr, height: canvas.height / dpr },
+      m
+    );
+
+    for (const el of visibleElements) {
       drawElement(rough, ctx, el);
     }
 
