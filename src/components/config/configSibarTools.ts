@@ -1,12 +1,12 @@
-import { Hand, LayoutTemplate, LucideIcon,  NotebookPen,  Pencil, Send } from "lucide-react"
+import { Hand, LayoutTemplate, LucideIcon, NotebookPen, Pencil, Send } from "lucide-react"
 import type { ToolType } from "../../store/slices/toolSlice"
-
 
 export type TypeConfigSidebar = {
     id: number,
     icon: LucideIcon,
     text: string,
-    tool: ToolType
+    tool: ToolType,
+    subTools?: { tool: ToolType, text: string }[]
 }
 
 export const configSidebarTools: TypeConfigSidebar[] = [
@@ -26,7 +26,12 @@ export const configSidebarTools: TypeConfigSidebar[] = [
         id: 2,
         icon: LayoutTemplate,
         text: "Shapes",
-        tool: 'rectangle'
+        tool: 'rectangle',
+        subTools: [
+            { tool: 'rectangle', text: 'Rectangle' },
+            { tool: 'ellipse', text: 'Ellipse' },
+            { tool: 'line', text: 'Line' },
+        ]
     },
     {
         id: 3,
