@@ -18,16 +18,16 @@ export default function Sidebar() {
     }
 
     return (
-        <div className="fixed left-2 top-1/2 z-50 flex w-16 -translate-y-1/2 flex-col items-center border-2 border-primary bg-surface p-1.5 shadow-hard md:left-10">
-            <span className="text-sm font-bold">TOOLS</span>
-            <hr className="h-px w-12 bg-primary" />
-            <ul className="flex flex-col items-center justify-center space-y-1.5 cursor-pointer pt-2">
+        <div className="fixed left-2 top-1/2 z-50 flex w-14 -translate-y-1/2 flex-col items-center border-2 border-primary bg-surface p-1 shadow-hard md:left-10">
+            <span className="text-xs font-bold">TOOLS</span>
+            <hr className="h-px w-10 bg-primary" />
+            <ul className="flex flex-col items-center justify-center space-y-0.5 cursor-pointer pt-1">
                 {configSidebarTools.map((item) => (
                     <li key={item.id}>
                         <button
                             type="button"
                             title={item.text}
-                            className={`px-1.5 py-2 flex flex-col items-center rounded-md space-y-0.5 md:w-12 transition-colors ${(item.subTools ? ['rectangle', 'ellipse', 'line'].includes(activeTool) : activeTool === item.tool) ? "bg-accent-blue text-white w-12 border-2 px-2 border-primary" : "bg-white border-2 border-transparent"}`}
+                            className={`flex w-10 flex-col items-center rounded-md border-2 px-1 py-1 transition-colors ${(item.subTools ? ['rectangle', 'ellipse', 'line'].includes(activeTool) : activeTool === item.tool) ? "border-primary bg-accent-blue text-white" : "border-transparent bg-white"}`}
                             onClick={() => {
                                 if (item.subTools) {
                                     setShowShapes(prev => !prev);
@@ -37,7 +37,7 @@ export default function Sidebar() {
                                 }
                             }}
                         >
-                            <item.icon className="size-5" />
+                            <item.icon className="size-4" />
                             <span className="font-display text-[10px]">{item.text}</span>
                         </button>
                     </li>
