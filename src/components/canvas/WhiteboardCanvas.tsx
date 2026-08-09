@@ -151,7 +151,7 @@ export default function WhiteboardCanvas() {
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.button === 1 || (event.button === 0 && spaceRef.current)) {
+      if (event.button === 1 || (event.button === 0 && (spaceRef.current || activeToolRef.current === 'pan'))) {
         event.preventDefault();
         panState.current = { active: true, startX: event.clientX, startY: event.clientY };
         canvas.setPointerCapture(event.pointerId);
@@ -207,7 +207,9 @@ export default function WhiteboardCanvas() {
     activeTool !== 'ellipse' &&
     activeTool !== 'line' &&
     activeTool !== 'eraser' &&
-    activeTool !== 'pan';
+    activeTool !== 'pan' &&
+    activeTool !== 'text' &&
+    activeTool !== 'sticky';
 
   useSelectionEngine({
     canvasRef,
@@ -221,7 +223,7 @@ export default function WhiteboardCanvas() {
     <div ref={containerRef} className="h-full w-full">
       <canvas
         ref={canvasRef}
-        className="h-full w-full"
+        className={`h-full w-full ${activeTool === 'pan' ? 'cursor-grab' : activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
         style={{
           touchAction: 'none',
           backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,

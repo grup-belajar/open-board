@@ -124,6 +124,14 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
     stateRef.current = { mode: 'idle', startWorld: world, originals: [] };
   }, [canvasRef, getMatrix, dispatch, isPanGesture, getCanvasPoint, getResizeCorner, enabled]);
 
+  const mergeMoved = useCallback(
+    (moved: CanvasElement[]): CanvasElement[] => {
+      const byId = new Map(moved.map((el) => [el.id, el]));
+      return elementsRef.current.map((el) => byId.get(el.id) ?? el);
+    },
+    []
+  );
+
   const onPointerMove = useCallback((event: PointerEvent) => {
     const state = stateRef.current;
     if (state.mode === 'idle') return;
@@ -143,7 +151,7 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         }
         return { ...el, x: el.x + dx, y: el.y + dy };
       });
-      dispatch(setElements(moved));
+      dispatch(setElements(mergeMoved(moved)));
       redraw();
       return;
     }
@@ -203,11 +211,11 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         };
       });
 
-      dispatch(setElements(resized));
+      dispatch(setElements(mergeMoved(resized)));
       redraw();
       return;
     }
-  }, [getMatrix, dispatch, redraw, getCanvasPoint]);
+  }, [getMatrix, dispatch, redraw, getCanvasPoint, mergeMoved]);
 
   const onPointerUp = useCallback(() => {
     if (stateRef.current.mode !== 'idle') {

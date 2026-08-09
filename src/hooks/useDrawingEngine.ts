@@ -72,6 +72,50 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
         return;
       }
 
+      if (toolRef.current === 'text') {
+        const textVal = prompt('Masukkan teks:', 'Text');
+        if (textVal) {
+          dispatch(
+            addElement({
+              id: newId(),
+              type: 'text',
+              x: world.x,
+              y: world.y,
+              strokeColor: styleRef.current.strokeColor || '#000000',
+              fillColor: 'transparent',
+              strokeWidth: styleRef.current.strokeWidth || 2,
+              roughness: 1,
+              text: textVal,
+            })
+          );
+          redraw();
+        }
+        return;
+      }
+
+      if (toolRef.current === 'sticky') {
+        const textVal = prompt('Masukkan catatan:', 'Catatan baru');
+        if (textVal !== null) {
+          dispatch(
+            addElement({
+              id: newId(),
+              type: 'sticky',
+              x: world.x,
+              y: world.y,
+              width: 160,
+              height: 120,
+              strokeColor: '#000000',
+              fillColor: styleRef.current.fillColor === 'transparent' ? '#fef08a' : styleRef.current.fillColor,
+              strokeWidth: 2,
+              roughness: 1,
+              text: textVal || 'Catatan',
+            })
+          );
+          redraw();
+        }
+        return;
+      }
+
       if (!DRAWING_TOOLS.has(toolRef.current)) return;
 
       const style = styleRef.current;
