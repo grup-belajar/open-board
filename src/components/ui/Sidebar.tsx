@@ -47,7 +47,7 @@ export default function Sidebar() {
             {showShapes && (
                 <div className="absolute left-full top-1/2 ml-3 -translate-y-1/2 z-50 bg-white border-2 border-primary shadow-hard">
                     <ul className="flex flex-col">
-                        {configSidebarTools[2].subTools!.map((sub) => (
+                        {configSidebarTools.find((item) => item.subTools)?.subTools!.map((sub) => (
                             <li key={sub.tool}>
                                 <button
                                     type="button"
