@@ -26,9 +26,10 @@ interface SelectionEngineProps {
   getMatrix: () => Matrix2D;
   redraw: () => void;
   isPanGesture: (event: PointerEvent) => boolean;
+  enabled?: boolean;
 }
 
-export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPanGesture }: SelectionEngineProps) {
+export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPanGesture, enabled = true }: SelectionEngineProps) {
   const dispatch = useAppDispatch();
   const elements = useAppSelector((state) => state.canvas.elements);
   const selectedElementIds = useAppSelector((state) => state.canvas.selectedElementIds);
@@ -77,6 +78,7 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
   );
 
   const onPointerDown = useCallback((event: PointerEvent) => {
+    if (!enabled) return;
     if (isPanGesture(event)) return;
     if (event.button !== 0) return;
     if (canvasRef.current) canvasRef.current.setPointerCapture(event.pointerId);
@@ -120,7 +122,15 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
 
     dispatch(setSelectedElementIds([]));
     stateRef.current = { mode: 'idle', startWorld: world, originals: [] };
-  }, [canvasRef, getMatrix, dispatch, isPanGesture, getCanvasPoint, getResizeCorner]);
+  }, [canvasRef, getMatrix, dispatch, isPanGesture, getCanvasPoint, getResizeCorner, enabled]);
+
+  const mergeMoved = useCallback(
+    (moved: CanvasElement[]): CanvasElement[] => {
+      const byId = new Map(moved.map((el) => [el.id, el]));
+      return elementsRef.current.map((el) => byId.get(el.id) ?? el);
+    },
+    []
+  );
 
   const onPointerMove = useCallback((event: PointerEvent) => {
     const state = stateRef.current;
@@ -141,7 +151,7 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         }
         return { ...el, x: el.x + dx, y: el.y + dy };
       });
-      dispatch(setElements(moved));
+      dispatch(setElements(mergeMoved(moved)));
       redraw();
       return;
     }
@@ -201,11 +211,11 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         };
       });
 
-      dispatch(setElements(resized));
+      dispatch(setElements(mergeMoved(resized)));
       redraw();
       return;
     }
-  }, [getMatrix, dispatch, redraw, getCanvasPoint]);
+  }, [getMatrix, dispatch, redraw, getCanvasPoint, mergeMoved]);
 
   const onPointerUp = useCallback(() => {
     if (stateRef.current.mode !== 'idle') {

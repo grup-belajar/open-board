@@ -1,41 +1,60 @@
-import { Hand, LayoutTemplate, LucideIcon, NotebookPen, Pencil, Save, Send } from "lucide-react"
-
+import { Eraser, Hand, LayoutTemplate, LucideIcon, NotebookPen, Pencil, Send, Type } from "lucide-react"
+import type { ToolType } from "../../store/slices/toolSlice"
 
 export type TypeConfigSidebar = {
     id: number,
     icon: LucideIcon,
-    text: string
+    text: string,
+    tool: ToolType,
+    subTools?: { tool: ToolType, text: string }[]
 }
 
 export const configSidebarTools: TypeConfigSidebar[] = [
     {
         id: 0,
         icon: Send,
-        text: "Select"
+        text: "Select",
+        tool: 'select'
     },
     {
         id: 1,
         icon: Hand,
-        text: "Pan"
+        text: "Pan",
+        tool: 'pan'
     },
     {
         id: 2,
-        icon: LayoutTemplate,
-        text: "Shapes"
+        icon: Pencil,
+        text: "Pen",
+        tool: 'pen'
     },
     {
         id: 3,
-        icon: Pencil,
-        text: "Text"
+        icon: LayoutTemplate,
+        text: "Shapes",
+        tool: 'rectangle',
+        subTools: [
+            { tool: 'rectangle', text: 'Rectangle' },
+            { tool: 'ellipse', text: 'Ellipse' },
+            { tool: 'line', text: 'Line' },
+        ]
     },
     {
         id: 4,
-        icon: NotebookPen,
-        text: "Notes"
+        icon: Type,
+        text: "Text",
+        tool: 'text'
     },
     {
         id: 5,
-        icon: Save,
-        text: "Save"
+        icon: NotebookPen,
+        text: "Notes",
+        tool: 'sticky'
+    },
+    {
+        id: 6,
+        icon: Eraser,
+        text: "Eraser",
+        tool: 'eraser'
     }
 ]

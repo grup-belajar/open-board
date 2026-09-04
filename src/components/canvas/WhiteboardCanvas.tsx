@@ -6,15 +6,13 @@ import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
 import { getMatrixFromState, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
 import { getElementBounds, mergeBounds } from '../../lib/geometry';
+import { getVisibleElements } from '../../lib/viewportCulling';
+import type { CanvasElement } from '../../store/slices/canvasSlice';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
+import useDrawingEngine from '../../hooks/useDrawingEngine';
 
-type BlurCanvas = {
-  blurCanvas: string
-}
-
-export default function WhiteboardCanvas(props: BlurCanvas) {
-  const { blurCanvas } = props
+export default function WhiteboardCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -22,27 +20,18 @@ export default function WhiteboardCanvas(props: BlurCanvas) {
   const matrixRef = useRef<Matrix2D>(getMatrixFromState({ x: 0, y: 0 }, 1));
   const spaceRef = useRef(false);
   const panState = useRef({ active: false, startX: 0, startY: 0 });
+  const draftRef = useRef<CanvasElement | null>(null);
 
   const dispatch = useAppDispatch();
   const elements = useAppSelector((state) => state.canvas.elements);
   const selectedElementIds = useAppSelector((state) => state.canvas.selectedElementIds);
   const panOffset = useAppSelector((state) => state.canvas.panOffset);
   const zoomLevel = useAppSelector((state) => state.canvas.zoomLevel);
+  const activeTool = useAppSelector((state) => state.tool.activeTool);
 
   const elementsRef = useRef(elements);
   const selectionRef = useRef(selectedElementIds);
-
-  useEffect(() => {
-    elementsRef.current = elements;
-  }, [elements]);
-
-  useEffect(() => {
-    selectionRef.current = selectedElementIds;
-  }, [selectedElementIds]);
-
-  useEffect(() => {
-    matrixRef.current = getMatrixFromState(panOffset, zoomLevel);
-  }, [panOffset, zoomLevel]);
+  const activeToolRef = useRef(activeTool);
 
   const syncViewport = useCallback(() => {
     const m = matrixRef.current;
@@ -66,12 +55,39 @@ export default function WhiteboardCanvas(props: BlurCanvas) {
       canvas.height / (dpr * m.d)
     );
 
-    for (const el of elementsRef.current) {
-      drawElement(rough, el);
+    const visibleElements = getVisibleElements(
+      elementsRef.current,
+      { width: canvas.width / dpr, height: canvas.height / dpr },
+      m
+    );
+
+    for (const el of visibleElements) {
+      drawElement(rough, ctx, el);
     }
+
+    const draft = draftRef.current;
+    if (draft) drawElement(rough, ctx, draft);
 
     drawSelectionOverlay(ctx, elementsRef.current, selectionRef.current, m, dpr);
   }, []);
+
+  useEffect(() => {
+    elementsRef.current = elements;
+    draw();
+  }, [elements, draw]);
+
+  useEffect(() => {
+    selectionRef.current = selectedElementIds;
+    draw();
+  }, [selectedElementIds, draw]);
+
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+  }, [activeTool]);
+
+  useEffect(() => {
+    matrixRef.current = getMatrixFromState(panOffset, zoomLevel);
+  }, [panOffset, zoomLevel]);
 
   const getCanvasPoint = useCallback((clientX: number, clientY: number) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -81,7 +97,9 @@ export default function WhiteboardCanvas(props: BlurCanvas) {
   const getMatrix = useCallback(() => matrixRef.current, []);
 
   const isPanGesture = useCallback(
-    (event: PointerEvent) => event.button === 1 || (event.button === 0 && spaceRef.current),
+    (event: PointerEvent) =>
+      event.button === 1 ||
+      (event.button === 0 && (spaceRef.current || activeToolRef.current === 'pan')),
     []
   );
 
@@ -140,7 +158,7 @@ export default function WhiteboardCanvas(props: BlurCanvas) {
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.button === 1 || (event.button === 0 && spaceRef.current)) {
+      if (event.button === 1 || (event.button === 0 && (spaceRef.current || activeToolRef.current === 'pan'))) {
         event.preventDefault();
         panState.current = { active: true, startX: event.clientX, startY: event.clientY };
         canvas.setPointerCapture(event.pointerId);
@@ -182,25 +200,47 @@ export default function WhiteboardCanvas(props: BlurCanvas) {
     };
   }, [draw, getCanvasPoint, syncViewport]);
 
-  useSelectionEngine({
+  useDrawingEngine({
     canvasRef,
+    draftRef,
     getMatrix,
     redraw: draw,
     isPanGesture,
   });
 
+  const selectionEnabled =
+    activeTool !== 'pen' &&
+    activeTool !== 'rectangle' &&
+    activeTool !== 'ellipse' &&
+    activeTool !== 'line' &&
+    activeTool !== 'eraser' &&
+    activeTool !== 'pan' &&
+    activeTool !== 'text' &&
+    activeTool !== 'sticky';
+
+  useSelectionEngine({
+    canvasRef,
+    getMatrix,
+    redraw: draw,
+    isPanGesture,
+    enabled: selectionEnabled,
+  });
+
   return (
-    <canvas
-      ref={canvasRef}
-      className={blurCanvas}
-      style={{
-        backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
-        backgroundSize: '24px 24px',
-        backgroundPosition: '0 0',
-        backgroundAttachment: 'local ',
-      }}
-      data-testid="whiteboard-canvas"
-    />
+    <div ref={containerRef} className="h-full w-full">
+      <canvas
+        ref={canvasRef}
+        className={`h-full w-full ${activeTool === 'pan' ? 'cursor-grab' : activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
+        style={{
+          touchAction: 'none',
+          backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
+          backgroundSize: '24px 24px',
+          backgroundPosition: '0 0',
+          backgroundAttachment: 'local ',
+        }}
+        data-testid="whiteboard-canvas"
+      />
+    </div>
   );
 }
 
@@ -223,6 +263,7 @@ function drawSelectionOverlay(
   const w = br.x - tl.x;
   const h = br.y - tl.y;
 
+  ctx.save();
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.strokeStyle = '#3b82f6';
   ctx.lineWidth = 2;
@@ -240,4 +281,5 @@ function drawSelectionOverlay(
   ]) {
     ctx.fillRect(hx - size / 2, hy - size / 2, size, size);
   }
+  ctx.restore();
 }
