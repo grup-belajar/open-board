@@ -58,3 +58,6 @@
   transform: translate(8px, 8px);
   box-shadow: none;
 }
+#check-one:checked~.check-one {
+  @apply opacity-100
+}
