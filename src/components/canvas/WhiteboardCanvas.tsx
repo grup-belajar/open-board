@@ -9,7 +9,12 @@ import { getElementBounds, mergeBounds } from '../../lib/geometry';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
 
-export default function WhiteboardCanvas() {
+type BlurCanvas = {
+  blurCanvas: string
+}
+
+export default function WhiteboardCanvas(props: BlurCanvas) {
+  const { blurCanvas } = props
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -187,7 +192,7 @@ export default function WhiteboardCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="h-full w-full"
+      className={blurCanvas}
       style={{
         backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
         backgroundSize: '24px 24px',
