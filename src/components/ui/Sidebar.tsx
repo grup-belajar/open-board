@@ -2,20 +2,35 @@
 import { MouseEvent, useState } from "react"
 import { configSidebarTools } from "../config/configSibarTools"
 import PropertyColors from "../properties/ProperyColors"
+import ModelExport from "./modal/ModelExport";
 
-function SudidebrColors() {
+type TypeSidebar = {
+    setBlur: (value: boolean) => void
+}
+function SudidebrColors(props: TypeSidebar) {
     const [propertiColor, setPropertiColors] = useState<boolean>(false);
-    const [active, seActive] = useState<number>(0)
+    const [save, setSave] = useState<boolean>(false);
+    const [active, setActive] = useState<number>(0)
+    const { setBlur } = props
     const handleClick = (event: MouseEvent<HTMLButtonElement>, id: number) => {
+        setActive(id)
+        setBlur(false)
         if (id === 3) {
             setPropertiColors(prev => !prev)
+            setSave(false)
+            return
         }
-        else
+        if (id === 5) {
+            setSave(prev => !prev)
             setPropertiColors(false)
-            seActive(id)
+            setBlur(true)
+            return
+        }
+        setPropertiColors(false)
+        setSave(false)
     }
     return (
-        <div className="bg-white fixed left-2 md:left-10 top-35 flex flex-col z-999 px-10 w-24 h-160 justify-center items-center rounded-md border-4 border-black space-y-2.5 shadow-hard">
+        <div className="bg-white fixed left-5 md:left-10 top-5 md:top-5 flex flex-col z-999 px-10 w-24 h-184 justify-center items-center rounded-md border-4 border-black space-y-2.5 shadow-hard">
             <span className="text-xl md:text-sm font-bold">TOOLS</span>
             <hr className="h-1 w-20 bg-black" />
             <ul className={`flex flex-col justify-center items-center space-y-6  cursor-pointer`}>
@@ -31,6 +46,9 @@ function SudidebrColors() {
 
             {propertiColor && (
                 <PropertyColors />
+            )}
+            {save && (
+                <ModelExport />
             )}
         </div>
     )

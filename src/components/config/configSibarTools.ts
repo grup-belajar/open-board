@@ -1,4 +1,4 @@
-import { Hand, LayoutTemplate, LucideIcon,  NotebookPen,  Pencil, Send } from "lucide-react"
+import { Hand, LayoutTemplate, LucideIcon, NotebookPen, Pencil, Save, Send } from "lucide-react"
 
 
 export type TypeConfigSidebar = {
@@ -32,5 +32,10 @@ export const configSidebarTools: TypeConfigSidebar[] = [
         id: 4,
         icon: NotebookPen,
         text: "Notes"
+    },
+    {
+        id: 5,
+        icon: Save,
+        text: "Save"
     }
 ]
