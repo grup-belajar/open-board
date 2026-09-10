@@ -65,9 +65,6 @@ export default function Sidebar() {
             {propertiColor && (
                 <PropertyColors />
             )}
-            {save && (
-                <ModelExport />
-            )}
         </div>
     )
 }
