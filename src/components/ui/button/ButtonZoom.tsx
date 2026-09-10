@@ -22,7 +22,7 @@ const ButtonZoom = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 hidden h-20 w-64 items-center justify-between border-4 border-primary bg-white shadow-hard md:left-10 md:flex">
+    <div className="absolute bottom-4 left-4 z-50 hidden h-20 w-64 items-center justify-between border-4 border-primary bg-white shadow-hard md:left-10 md:flex">
       <button
         type="button"
         onClick={() => zoomByStep(-ZOOM_STEP)}
