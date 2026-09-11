@@ -30,6 +30,11 @@ interface CanvasState {
   historyIndex: number;
 }
 
+export interface HydrateCanvasPayload {
+  elements: CanvasElement[];
+  selectedElementIds?: string[];
+}
+
 const MAX_HISTORY = 100;
 
 function cloneElements(elements: CanvasElement[]): CanvasElement[] {
@@ -63,6 +68,18 @@ export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
   reducers: {
+    hydrateCanvas: (state, action: PayloadAction<HydrateCanvasPayload>) => {
+      const elements = cloneElements(action.payload.elements);
+      const elementIds = new Set(elements.map((element) => element.id));
+
+      state.elements = elements;
+      state.selectedElementIds = (action.payload.selectedElementIds ?? [])
+        .filter((id) => elementIds.has(id));
+      state.panOffset = { x: 0, y: 0 };
+      state.zoomLevel = 1;
+      state.history = [cloneElements(elements)];
+      state.historyIndex = 0;
+    },
     setElements: (state, action: PayloadAction<CanvasElement[]>) => {
       state.elements = action.payload;
     },
@@ -120,6 +137,7 @@ export const canvasSlice = createSlice({
 });
 
 export const {
+  hydrateCanvas,
   setElements,
   addElement,
   updateElement,

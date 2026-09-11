@@ -2,7 +2,7 @@ import type { CanvasElement } from '../slices/canvasSlice';
 import { saveBoard, loadBoard } from '../../lib/db';
 import type { Middleware } from '@reduxjs/toolkit';
 
-let previousSnapshot = '';
+let previousSnapshotKey = '';
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** [FE-03.1] Autosave Redux -> IndexedDB setiap 2 detik jika ada perubahan. */
@@ -13,10 +13,10 @@ const AUTOSAVE_DELAY_MS = 2000;
  * supaya tiap board tersimpan terpisah di IndexedDB.
  * Middleware ini hanya berjalan di browser, jadi aman pakai window.location.
  */
-function getCurrentBoardId(): string {
-  if (typeof window === 'undefined') return 'default-board';
+function getCurrentBoardId(): string | null {
+  if (typeof window === 'undefined') return null;
   const match = window.location.pathname.match(/\/board\/([^/]+)/);
-  return match ? decodeURIComponent(match[1]) : 'default-board';
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 export const indexedDbSyncMiddleware: Middleware = (store) => (next) => (action) => {
@@ -25,23 +25,27 @@ export const indexedDbSyncMiddleware: Middleware = (store) => (next) => (action)
   // Guard SSR: middleware ini tidak boleh menyentuh IndexedDB di server.
   if (typeof window === 'undefined') return result;
 
+  const boardId = getCurrentBoardId();
+  if (!boardId) return result;
+
   const state = store.getState() as { canvas: { elements: CanvasElement[] } };
   const snapshot = JSON.stringify(state.canvas.elements);
+  const snapshotKey = `${boardId}:${snapshot}`;
 
   // Hindari menjadwalkan save kalau action tidak benar-benar mengubah elemen
   // (mis. action UI seperti setSelectedElementIds).
-  if (snapshot === previousSnapshot) return result;
-  previousSnapshot = snapshot;
+  if (snapshotKey === previousSnapshotKey) return result;
+  previousSnapshotKey = snapshotKey;
+  const elementsToSave = JSON.parse(snapshot) as CanvasElement[];
 
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
-    const boardId = getCurrentBoardId();
     void (async () => {
       try {
         // Pertahankan nama board yang sudah ada, jangan sampai autosave
         // menimpa nama board dengan "Untitled Board" tiap kali save.
         const existing = await loadBoard(boardId);
-        await saveBoard(boardId, state.canvas.elements, existing?.name ?? 'Untitled Board');
+        await saveBoard(boardId, elementsToSave, existing?.name ?? 'Untitled Board');
       } catch (err) {
         console.error('[OpenBoard] Autosave ke IndexedDB gagal:', err);
       }
