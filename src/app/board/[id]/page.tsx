@@ -56,7 +56,6 @@ export default function BoardPage() {
 
   return (
     <>
-
       <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
         <Navbar />
         <div className="relative flex-1">

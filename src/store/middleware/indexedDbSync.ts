@@ -25,22 +25,21 @@ export const indexedDbSyncMiddleware: Middleware = (store) => (next) => (action)
   const snapshot = JSON.stringify(state.canvas.elements);
   const snapshotKey = `${boardId}:${snapshot}`;
 
-  if (snapshotKey !== previousSnapshotKey) {
-    previousSnapshotKey = snapshotKey;
-    const elementsToSave = JSON.parse(snapshot) as CanvasElement[];
+  if (snapshotKey === previousSnapshotKey) return result;
+  previousSnapshotKey = snapshotKey;
+  const elementsToSave = JSON.parse(snapshot) as CanvasElement[];
 
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      void (async () => {
-        try {
-          const existing = await loadBoard(boardId);
-          await saveBoard(boardId, elementsToSave, existing?.name ?? 'Untitled Board');
-        } catch (error) {
-          console.error(`[OpenBoard] Autosave board ${boardId} gagal:`, error);
-        }
-      })();
-    }, AUTOSAVE_DELAY_MS);
-  }
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    void (async () => {
+      try {
+        const existing = await loadBoard(boardId);
+        await saveBoard(boardId, elementsToSave, existing?.name ?? 'Untitled Board');
+      } catch (error) {
+        console.error(`[OpenBoard] Autosave board ${boardId} gagal:`, error);
+      }
+    })();
+  }, AUTOSAVE_DELAY_MS);
 
   return result;
 };

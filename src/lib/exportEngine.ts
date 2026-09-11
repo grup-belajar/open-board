@@ -1,4 +1,5 @@
 import type { CanvasElement } from '../store/slices/canvasSlice';
+import type { BoardRecord } from './db';
 import { createRoughRenderer, drawElement } from './roughEngine';
 
 export type PngScale = 1 | 2 | 3;
@@ -36,6 +37,10 @@ export function exportToJson(elements: CanvasElement[], boardName = DEFAULT_FILE
   });
 
   triggerDownload(blob, `${slugify(boardName)}.json`);
+}
+
+export function exportBoardToJson(board: BoardRecord): void {
+  exportToJson(board.elements, board.name);
 }
 
 export async function exportElementsToPng(
