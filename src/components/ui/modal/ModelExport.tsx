@@ -1,58 +1,172 @@
-import { Check, Download, X } from "lucide-react"
-import { useState } from "react"
+'use client';
 
-const ModelExport = () => {
-    const [chekedOne, setCheckedOne] = useState<boolean>(false)
-    const [chekedTwo, setCheckedTwo] = useState<boolean>(false)
-    return (
-            <div className="absolute top-[25%] md:top-[20%] lg:top-[10%] left-[30%] md:left-[20%] lg:left-[700%] w-72 md:w-150 md:h-165 lg:h-160 bg-white border-4 border-black z-999">
-                <div className="flex flex-row justify-between items-center px-5 py-5 bg-accent-pink border-b-4 border-black">
-                    <h2 className="text-40 font-body text-white font-semibold">Export & Simpan Papan</h2>
-                    <button type="button" className="bg-white border-2 border-black cursor-pointer"><X /></button>
-                </div>
-                <div className="flex flex-col px-5 py-5 space-y-3.5 md:space-y-10 border-b-4 border-black">
-                    <div className="flex flex-col space-y-3">
-                        <h2 className="uppercase text-xl font-light text-gray-600">format export</h2>
-                        <div className="flex flex-row justify-between space-x-4">
-                            <button type="button" className="bg-accent-blue w-30 h-12 md:w-44 md:h-20 border-4 border-black font-bold text-white">PNG</button>
-                            <button type="button" className="bg-white w-30 h-12 md:w-44 md:h-20 border-4 border-black font-black">SVG</button>
-                            <button type="button" className="bg-white w-30 h-12 md:w-44 md:h-20 border-4 border-black font-black">JSON</button>
-                        </div>
-                    </div>
-                    <div className="flex flex-col space-y-3">
-                        <h2 className="uppercase text-base md:text-xl font-light text-gray-600">Opsi</h2>
-                        <div className="flex flex-row gap-2" >
-                            <ul className="space-y-3.5">
-                                <label htmlFor="check-one" className="flex flex-row items-center space-x-2">
-                                    <input type="checkbox" name="check-one" id="check-one" checked={chekedOne} onChange={(e) => setCheckedOne(e.target.checked)} className="relative w-7 h-7 appearance-none border-4 border-black cursor-pointer" />
-                                    <Check className={`absolute left-6 ${chekedOne ? "opacity-100 bg-accent-blue text-white font-bold " : "opacity-0"}`} size={21} />
-                                    <li className="font-display text-sm md:text-md font-bold text-gray-600">Latar Belakang Transparan</li>
-                                </label>
-                                <label htmlFor="check-two" className="flex flex-row items-center space-x-2">
-                                    <input type="checkbox" name="check-two" id="check-two" checked={chekedTwo} onChange={(e) => setCheckedTwo(e.target.checked)} className="relative w-7 h-7 appearance-none border-4 border-black cursor-pointer" />
-                                    <Check className={`absolute left-6 ${chekedTwo ? "opacity-100 bg-accent-blue text-white font-bold " : "opacity-0"}`} size={21} />
-                                    <li className="font-display text-sm md:text-md font-bold text-gray-600">Sertakan Hanya Element Terpilih</li>
-                                </label>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="flex flex-col space-y-3">
-                        <h2 className="uppercase text-md font-light text-gray-600">Skala Gambar</h2>
-                        <div className="flex flex-row justify-between space-x-4">
-                            <button type="button" className="bg-accent-peach w-30 h-12 md:w-44 md:h-20 border-4 border-black font-bold text-black cursor-pointer">1x</button>
-                            <button type="button" className="bg-white w-30 h-12 md:w-44 md:h-20 border-4 border-black font-bold text-black cursor-pointer">2x (HD)</button>
-                            <button type="button" className="bg-white w-30 h-12 md:w-44 md:h-20 border-4 border-black font-bold text-black cursor-pointer">3x</button>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex flex-row px-2 md:px-5 py-5 md:justify-end items-center">
-                    <div className="flex flex-row space-x-2 md:space-x-5">
-                        <button type="button" className="bg-white border-4 border-black w-32 h-16 rounded-md font-display">Batal</button>
-                        <button type="button" className="flex flex-row gap-2 font-display items-center justify-center bg-accent-blue border-4 border-black w-32 md:w-40 h-16 rounded-md text-white"><Download className="hidden md:block" />Download</button>
-                    </div>
-                </div>
-            </div>
-    )
+import { Download, X } from 'lucide-react';
+import { useState } from 'react';
+import { useAppSelector } from '../../../store/hooks';
+import {
+  exportElementsToPng,
+  exportElementsToSvg,
+  exportToJson,
+  type PngScale,
+} from '../../../lib/exportEngine';
+
+type ExportFormat = 'png' | 'svg' | 'json';
+
+interface ModelExportProps {
+  onClose: () => void;
 }
 
-export default ModelExport
+const FORMAT_OPTIONS: { value: ExportFormat; label: string }[] = [
+  { value: 'png', label: 'PNG' },
+  { value: 'svg', label: 'SVG' },
+  { value: 'json', label: 'JSON' },
+];
+
+const SCALE_OPTIONS: PngScale[] = [1, 2, 3];
+
+export default function ModelExport({ onClose }: ModelExportProps) {
+  const elements = useAppSelector((state) => state.canvas.elements);
+  const selectedElementIds = useAppSelector((state) => state.canvas.selectedElementIds);
+  const [format, setFormat] = useState<ExportFormat>('png');
+  const [transparent, setTransparent] = useState(false);
+  const [selectedOnly, setSelectedOnly] = useState(false);
+  const [scale, setScale] = useState<PngScale>(1);
+  const [isExporting, setIsExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const exportElements = selectedOnly
+    ? elements.filter((element) => selectedElementIds.includes(element.id))
+    : elements;
+
+  const handleDownload = async () => {
+    setIsExporting(true);
+    setError(null);
+
+    try {
+      if (format === 'png') {
+        await exportElementsToPng(exportElements, { scale, transparent });
+      } else if (format === 'svg') {
+        exportElementsToSvg(exportElements, { transparent });
+      } else {
+        exportToJson(exportElements);
+      }
+      onClose();
+    } catch (exportError) {
+      console.error('[OpenBoard] Export gagal:', exportError);
+      setError('Export gagal. Coba lagi.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4" role="presentation">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-title"
+        className="max-h-[90vh] w-full max-w-xl overflow-y-auto border-4 border-black bg-white shadow-hard-lg"
+      >
+        <div className="flex items-center justify-between border-b-4 border-black bg-accent-pink px-5 py-4">
+          <h2 id="export-title" className="font-body text-xl font-semibold text-white">
+            Export &amp; Simpan Papan
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="border-2 border-black bg-white p-1 cursor-pointer"
+            aria-label="Tutup modal export"
+          >
+            <X aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="space-y-6 border-b-4 border-black px-5 py-5">
+          <fieldset>
+            <legend className="mb-3 uppercase text-xl font-light text-gray-600">Format export</legend>
+            <div className="grid grid-cols-3 gap-3">
+              {FORMAT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={format === option.value}
+                  onClick={() => setFormat(option.value)}
+                  className={`border-4 border-black px-3 py-3 font-bold cursor-pointer ${format === option.value ? 'bg-accent-blue text-white' : 'bg-white text-black'}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="space-y-3">
+            <legend className="uppercase text-xl font-light text-gray-600">Opsi</legend>
+            <label className="flex items-center gap-2 font-display text-sm font-bold text-gray-600">
+              <input
+                type="checkbox"
+                checked={transparent}
+                onChange={(event) => setTransparent(event.target.checked)}
+                className="h-5 w-5 cursor-pointer accent-blue-600"
+              />
+              Latar belakang transparan
+            </label>
+            <label className="flex items-center gap-2 font-display text-sm font-bold text-gray-600">
+              <input
+                type="checkbox"
+                checked={selectedOnly}
+                disabled={selectedElementIds.length === 0}
+                onChange={(event) => setSelectedOnly(event.target.checked)}
+                className="h-5 w-5 cursor-pointer accent-blue-600 disabled:cursor-not-allowed"
+              />
+              Hanya elemen terpilih
+              {selectedElementIds.length === 0 && <span className="font-normal">(belum ada pilihan)</span>}
+            </label>
+          </fieldset>
+
+          {format === 'png' && (
+            <fieldset>
+              <legend className="mb-3 uppercase text-xl font-light text-gray-600">Skala gambar</legend>
+              <div className="grid grid-cols-3 gap-3">
+                {SCALE_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={scale === option}
+                    onClick={() => setScale(option)}
+                    className={`border-4 border-black px-3 py-3 font-bold cursor-pointer ${scale === option ? 'bg-accent-peach' : 'bg-white'}`}
+                  >
+                    {option}x{option === 2 ? ' (HD)' : ''}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
+
+          <p className="font-mono text-xs text-gray-600">
+            PNG diekspor dari seluruh board, termasuk objek di luar viewport. {exportElements.length} elemen akan diproses.
+          </p>
+          {error && <p className="font-mono text-sm font-bold text-red-600" role="alert">{error}</p>}
+        </div>
+
+        <div className="flex justify-end gap-3 px-5 py-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="border-4 border-black bg-white px-5 py-3 font-display cursor-pointer"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isExporting}
+            className="inline-flex items-center justify-center gap-2 border-4 border-black bg-accent-blue px-5 py-3 font-display text-white cursor-pointer disabled:cursor-wait disabled:opacity-60"
+          >
+            <Download aria-hidden="true" />
+            {isExporting ? 'Memproses...' : 'Download'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
