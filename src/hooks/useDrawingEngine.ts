@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addElement, deleteElement, setSelectedElementIds } from '../store/slices/canvasSlice';
 import type { CanvasElement } from '../store/slices/canvasSlice';
+import type { DrawingStyle } from '../store/slices/toolSlice';
 import type { Matrix2D } from '../lib/matrixMath';
 import { screenToWorld } from '../lib/matrixMath';
 import { hitTest } from '../lib/geometry';
@@ -23,16 +24,21 @@ function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function roughnessForStyle(style: DrawingStyle): number {
+  return style === 'clean' ? 0 : 1;
+}
+
 export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redraw, isPanGesture }: DrawingEngineProps) {
   const dispatch = useAppDispatch();
   const activeTool = useAppSelector((state) => state.tool.activeTool);
   const strokeColor = useAppSelector((state) => state.tool.strokeColor);
   const fillColor = useAppSelector((state) => state.tool.fillColor);
   const strokeWidth = useAppSelector((state) => state.tool.strokeWidth);
+  const drawingStyle = useAppSelector((state) => state.tool.drawingStyle);
   const elements = useAppSelector((state) => state.canvas.elements);
 
   const toolRef = useRef(activeTool);
-  const styleRef = useRef({ strokeColor, fillColor, strokeWidth });
+  const styleRef = useRef({ strokeColor, fillColor, strokeWidth, drawingStyle });
   const elementsRef = useRef(elements);
   const drawingRef = useRef(false);
 
@@ -41,8 +47,8 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
   }, [activeTool]);
 
   useEffect(() => {
-    styleRef.current = { strokeColor, fillColor, strokeWidth };
-  }, [strokeColor, fillColor, strokeWidth]);
+    styleRef.current = { strokeColor, fillColor, strokeWidth, drawingStyle };
+  }, [strokeColor, fillColor, strokeWidth, drawingStyle]);
 
   useEffect(() => {
     elementsRef.current = elements;
@@ -84,7 +90,7 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
               strokeColor: styleRef.current.strokeColor || '#000000',
               fillColor: 'transparent',
               strokeWidth: styleRef.current.strokeWidth || 2,
-              roughness: 1,
+              roughness: roughnessForStyle(styleRef.current.drawingStyle),
               text: textVal,
             })
           );
@@ -107,7 +113,7 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
               strokeColor: styleRef.current.strokeColor || '#000000',
               fillColor: styleRef.current.fillColor === 'transparent' ? '#fef08a' : styleRef.current.fillColor,
               strokeWidth: styleRef.current.strokeWidth || 2,
-              roughness: 1,
+              roughness: roughnessForStyle(styleRef.current.drawingStyle),
               text: textVal || 'Catatan',
             })
           );
@@ -126,7 +132,7 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
         strokeColor: style.strokeColor,
         fillColor: style.fillColor,
         strokeWidth: style.strokeWidth,
-        roughness: 1,
+        roughness: roughnessForStyle(style.drawingStyle),
       };
 
       if (toolRef.current === 'pen') {

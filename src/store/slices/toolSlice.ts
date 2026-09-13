@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type ToolType = 'select' | 'pan' | 'pen' | 'rectangle' | 'ellipse' | 'line' | 'text' | 'sticky' | 'eraser';
+export type DrawingStyle = 'sketchy' | 'clean';
 
 interface ToolState {
   activeTool: ToolType;
+  drawingStyle: DrawingStyle;
   strokeColor: string;
   fillColor: string;
   strokeWidth: number;
@@ -11,6 +13,7 @@ interface ToolState {
 
 const initialState: ToolState = {
   activeTool: 'select',
+  drawingStyle: 'sketchy',
   strokeColor: '#000000',
   fillColor: 'transparent',
   strokeWidth: 2,
@@ -22,6 +25,9 @@ export const toolSlice = createSlice({
   reducers: {
     setActiveTool: (state, action: PayloadAction<ToolType>) => {
       state.activeTool = action.payload;
+    },
+    setDrawingStyle: (state, action: PayloadAction<DrawingStyle>) => {
+      state.drawingStyle = action.payload;
     },
     setStrokeColor: (state, action: PayloadAction<string>) => {
       state.strokeColor = action.payload;
@@ -35,5 +41,11 @@ export const toolSlice = createSlice({
   },
 });
 
-export const { setActiveTool, setStrokeColor, setFillColor, setStrokeWidth } = toolSlice.actions;
+export const {
+  setActiveTool,
+  setDrawingStyle,
+  setStrokeColor,
+  setFillColor,
+  setStrokeWidth,
+} = toolSlice.actions;
 export default toolSlice.reducer;

@@ -17,7 +17,7 @@ function toRoughOptions(options: RoughOptions) {
   return {
     stroke: options.strokeColor,
     fill: options.fillColor === 'transparent' ? undefined : options.fillColor,
-    fillStyle: 'hachure' as const,
+    fillStyle: options.roughness === 0 ? 'solid' as const : 'hachure' as const,
     strokeWidth: options.strokeWidth,
     roughness: options.roughness,
   };
