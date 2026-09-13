@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   return (
@@ -29,11 +30,14 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <button type="button" className="block border-2 border-primary p-2 md:hidden">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-          <path d="M3 6h18M3 12h18M3 18h18" />
-        </svg>
-      </button>
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        <button type="button" className="block border-2 border-primary p-2 md:hidden">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </button>
+      </div>
     </header>
   );
 }

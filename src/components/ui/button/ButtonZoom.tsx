@@ -22,11 +22,11 @@ const ButtonZoom = () => {
   }
 
   return (
-    <div className="absolute bottom-4 left-4 z-50 hidden h-20 w-64 items-center justify-between border-4 border-primary bg-white shadow-hard md:left-10 md:flex">
+    <div className="absolute bottom-4 left-4 z-50 hidden h-20 w-64 items-center justify-between border-4 border-primary bg-background shadow-hard md:left-10 md:flex">
       <button
         type="button"
         onClick={() => zoomByStep(-ZOOM_STEP)}
-        className="h-full w-20 cursor-pointer border-r-4 border-primary bg-white px-6"
+        className="h-full w-20 cursor-pointer border-r-4 border-primary bg-background px-6"
       >
         <Minus size={20} />
       </button>
@@ -34,7 +34,7 @@ const ButtonZoom = () => {
       <button
         type="button"
         onClick={() => zoomByStep(ZOOM_STEP)}
-        className="h-full w-20 cursor-pointer border-l-4 border-primary bg-white px-6"
+        className="h-full w-20 cursor-pointer border-l-4 border-primary bg-background px-6"
       >
         <Plus size={16} />
       </button>

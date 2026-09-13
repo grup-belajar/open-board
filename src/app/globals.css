@@ -3,10 +3,10 @@
 @theme {
   --color-primary: #000000;
   --color-on-primary: #ffffff;
-  --color-accent-blue: #3b82f6;
-  --color-accent-pink: #ec4899;
+  --color-accent-blue: #2563eb;
+  --color-accent-pink: #be185d;
   --color-accent-yellow: #eab308;
-  --color-accent-red: #E63946;
+  --color-accent-red: #b91c1c;
   --color-accent-green: #266210;
   --color-accent-peach: #FFBDA3;
   --color-surface: #f9f9f9;
@@ -43,6 +43,34 @@
 
   --shadow-hard: 8px 8px 0px 0px rgba(0, 0, 0, 1);
   --shadow-hard-lg: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+}
+
+:root {
+  color-scheme: light;
+  --canvas-dot-color: #d1d5db;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-primary: #f2eee4;
+  --color-on-primary: #181817;
+  --color-accent-blue: #245fc7;
+  --color-accent-pink: #a91f5a;
+  --color-accent-yellow: #d6ad32;
+  --color-accent-red: #ff7378;
+  --color-accent-green: #79a65b;
+  --color-accent-peach: #85462f;
+  --color-surface: #171716;
+  --color-surface-2: #22211f;
+  --color-surface-3: #2d2b28;
+  --color-surface-4: #383633;
+  --color-background: #1c1b19;
+  --color-on-surface: #f2eee4;
+  --color-on-surface-variant: #c3bdae;
+  --color-secondary: #9bbcff;
+  --canvas-dot-color: #555149;
+  --shadow-hard: 8px 8px 0px 0px rgba(255, 255, 255, 0.16);
+  --shadow-hard-lg: 12px 12px 0px 0px rgba(255, 255, 255, 0.18);
 }
 
 .neobrutal-button {

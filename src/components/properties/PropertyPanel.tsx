@@ -8,8 +8,8 @@ export default function PropertyPanel() {
   const { strokeColor, strokeWidth } = useAppSelector((state) => state.tool);
 
   return (
-    <aside className="fixed right-4 top-16 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-      <label className="mb-1 block text-xs font-medium text-gray-500">
+    <aside className="fixed right-4 top-16 w-48 rounded-lg border border-primary bg-background p-3 shadow-lg">
+      <label className="mb-1 block text-xs font-medium text-on-surface-variant">
         Warna
       </label>
       <input
@@ -18,7 +18,7 @@ export default function PropertyPanel() {
         onChange={(e) => dispatch(setStrokeColor(e.target.value))}
         className="mb-3 h-8 w-full cursor-pointer"
       />
-      <label className="mb-1 block text-xs font-medium text-gray-500">
+      <label className="mb-1 block text-xs font-medium text-on-surface-variant">
         Ukuran Stroke: {strokeWidth}px
       </label>
       <input

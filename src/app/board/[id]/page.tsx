@@ -56,13 +56,13 @@ export default function BoardPage() {
 
   return (
     <>
-      <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+      <div className="flex h-screen flex-col overflow-hidden bg-background">
         <Navbar />
         <div className="relative flex-1">
           {isHydrating ? (
-            <div className="flex h-full items-center justify-center bg-gray-50" aria-live="polite">
+            <div className="flex h-full items-center justify-center bg-background" aria-live="polite">
               {currentLoadError ? (
-                <div className="flex flex-col items-center gap-4 border-4 border-black bg-white p-6 text-center shadow-hard">
+                <div className="flex flex-col items-center gap-4 border-4 border-primary bg-background p-6 text-center shadow-hard">
                   <p className="font-display text-lg font-bold">{currentLoadError}</p>
                   <button
                     type="button"
@@ -70,7 +70,7 @@ export default function BoardPage() {
                       setLoadError(null);
                       setLoadAttempt((attempt) => attempt + 1);
                     }}
-                    className="border-4 border-black bg-accent-blue px-5 py-3 font-display font-bold text-white shadow-hard hover:shadow-none"
+                    className="border-4 border-primary bg-accent-blue px-5 py-3 font-display font-bold text-white shadow-hard hover:shadow-none"
                   >
                     Coba Lagi
                   </button>

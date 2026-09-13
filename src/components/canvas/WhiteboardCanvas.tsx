@@ -237,7 +237,7 @@ export default function WhiteboardCanvas() {
         className={`h-full w-full ${activeTool === 'pan' ? 'cursor-grab' : activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
         style={{
           touchAction: 'none',
-          backgroundImage: `radial-gradient(circle, #d1d5db 2px, transparent 2px)`,
+          backgroundImage: 'radial-gradient(circle, var(--canvas-dot-color) 2px, transparent 2px)',
           backgroundSize: '24px 24px',
           backgroundPosition: '0 0',
           backgroundAttachment: 'local ',

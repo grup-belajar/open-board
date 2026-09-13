@@ -22,7 +22,7 @@ export default function ButtonShorcut({ onOpenExport }: ButtonShortcutProps) {
           type="button"
           onClick={() => dispatch(undo())}
           disabled={!canUndo}
-          className="h-12 cursor-pointer border-4 border-black bg-white px-2 shadow-hard transition-all hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 md:h-14 md:px-5"
+          className="h-12 cursor-pointer border-4 border-primary bg-background px-2 shadow-hard transition-all hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 md:h-14 md:px-5"
           title="Undo (CTRL + Z)"
           aria-label="Undo"
         >
@@ -32,7 +32,7 @@ export default function ButtonShorcut({ onOpenExport }: ButtonShortcutProps) {
           type="button"
           onClick={() => dispatch(redo())}
           disabled={!canRedo}
-          className="h-12 cursor-pointer border-4 border-black bg-white px-2 shadow-hard transition-all hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 md:h-14 md:px-5"
+          className="h-12 cursor-pointer border-4 border-primary bg-background px-2 shadow-hard transition-all hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 md:h-14 md:px-5"
           title="Redo (CTRL + Y)"
           aria-label="Redo"
         >
@@ -41,7 +41,7 @@ export default function ButtonShorcut({ onOpenExport }: ButtonShortcutProps) {
         <button
           type="button"
           onClick={onOpenExport}
-          className="h-12 cursor-pointer border-4 border-black bg-accent-blue px-2 text-white shadow-hard transition-all hover:shadow-none md:h-14 md:px-5"
+          className="h-12 cursor-pointer border-4 border-primary bg-accent-blue px-2 text-white shadow-hard transition-all hover:shadow-none md:h-14 md:px-5"
           title="Export board"
           aria-label="Export board"
         >

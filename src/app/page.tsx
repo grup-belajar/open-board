@@ -15,7 +15,7 @@ import {
 import type { CanvasElement } from '../store/slices/canvasSlice';
 
 const TAGS = [
-  { label: 'DIAGRAM', tagColor: 'bg-accent-yellow', rotate: 'rotate-6' },
+  { label: 'DIAGRAM', tagColor: 'bg-accent-yellow text-black', rotate: 'rotate-6' },
   { label: 'MINDMAP', tagColor: 'bg-accent-blue text-white', rotate: '-rotate-3' },
   { label: 'SKETSA', tagColor: 'bg-accent-pink text-white', rotate: 'rotate-2' },
 ];
@@ -132,7 +132,7 @@ export default function HomePage() {
               Papan Tulis Digital Bebas
             </h2>
 
-            <p className="mb-12 inline-block max-w-xl border-2 border-primary bg-white/90 p-4 font-body text-body-lg text-on-surface">
+            <p className="mb-12 inline-block max-w-xl border-2 border-primary bg-background/90 p-4 font-body text-body-lg text-on-surface">
               Coret-coret ide, buat diagram, gratis! Tanpa login, langsung eksekusi.
             </p>
 
@@ -149,7 +149,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleOpenJsonClick}
-                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-white px-10 py-5 font-display text-2xl font-black uppercase text-primary shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none"
+                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-background px-10 py-5 font-display text-2xl font-black uppercase text-primary shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none"
               >
                 <FolderOpen className="h-6 w-6 stroke-[3]" />
                 Buka File JSON
@@ -164,7 +164,7 @@ export default function HomePage() {
             </div>
 
             {importError && (
-              <p className="mt-4 border-2 border-accent-pink bg-white px-4 py-2 font-mono text-label-sm text-accent-pink">
+              <p className="mt-4 border-2 border-accent-pink bg-background px-4 py-2 font-mono text-label-sm text-accent-red">
                 {importError}
               </p>
             )}
@@ -215,7 +215,7 @@ export default function HomePage() {
                   return (
                     <div
                       key={board.id}
-                      className="group relative border-4 border-primary bg-white p-4 shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg"
+                      className="group relative border-4 border-primary bg-background p-4 shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg"
                     >
                       <div
                         className={`absolute -right-4 -top-4 z-20 ${tag.tagColor} ${tag.rotate} border-2 border-primary px-3 py-1 font-mono text-label-sm font-bold`}
@@ -290,13 +290,13 @@ export default function HomePage() {
               href="https://github.com/grup-belajar/open-board"
               target="_blank"
               rel="noopener noreferrer"
-              className="border-4 border-white bg-white px-8 py-4 font-display text-xl font-black uppercase text-primary transition-all hover:bg-transparent hover:text-white"
+              className="border-4 border-on-primary bg-background px-8 py-4 font-display text-xl font-black uppercase text-primary transition-all hover:bg-transparent hover:text-on-primary"
             >
               Kontribusi di GitHub
             </a>
             <button
               type="button"
-              className="border-4 border-accent-blue bg-accent-blue px-8 py-4 font-display text-xl font-black uppercase text-white transition-all hover:bg-white hover:text-accent-blue"
+              className="border-4 border-accent-blue bg-accent-blue px-8 py-4 font-display text-xl font-black uppercase text-white transition-all hover:bg-background hover:text-accent-blue"
             >
               Join Community
             </button>

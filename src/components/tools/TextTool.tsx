@@ -17,7 +17,7 @@ export default function TextTool() {
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={() => setIsActive(false)}
-      className="resize-none border border-gray-300 bg-white p-1 text-sm"
+      className="resize-none border border-primary bg-background p-1 text-sm text-on-surface"
     />
   );
 }

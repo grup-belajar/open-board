@@ -65,25 +65,25 @@ export default function ModelExport({ onClose }: ModelExportProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="export-title"
-        className="max-h-[90vh] w-full max-w-xl overflow-y-auto border-4 border-black bg-white shadow-hard-lg"
+        className="max-h-[90vh] w-full max-w-xl overflow-y-auto border-4 border-primary bg-background shadow-hard-lg"
       >
-        <div className="flex items-center justify-between border-b-4 border-black bg-accent-pink px-5 py-4">
+        <div className="flex items-center justify-between border-b-4 border-primary bg-accent-pink px-5 py-4">
           <h2 id="export-title" className="font-body text-xl font-semibold text-white">
             Export &amp; Simpan Papan
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="border-2 border-black bg-white p-1 cursor-pointer"
+            className="border-2 border-primary bg-background p-1 cursor-pointer"
             aria-label="Tutup modal export"
           >
             <X aria-hidden="true" />
           </button>
         </div>
 
-        <div className="space-y-6 border-b-4 border-black px-5 py-5">
+        <div className="space-y-6 border-b-4 border-primary px-5 py-5">
           <fieldset>
-            <legend className="mb-3 uppercase text-xl font-light text-gray-600">Format export</legend>
+            <legend className="mb-3 uppercase text-xl font-light text-on-surface-variant">Format export</legend>
             <div className="grid grid-cols-3 gap-3">
               {FORMAT_OPTIONS.map((option) => (
                 <button
@@ -91,7 +91,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                   type="button"
                   aria-pressed={format === option.value}
                   onClick={() => setFormat(option.value)}
-                  className={`border-4 border-black px-3 py-3 font-bold cursor-pointer ${format === option.value ? 'bg-accent-blue text-white' : 'bg-white text-black'}`}
+                  className={`border-4 border-primary px-3 py-3 font-bold cursor-pointer ${format === option.value ? 'bg-accent-blue text-white' : 'bg-background text-primary'}`}
                 >
                   {option.label}
                 </button>
@@ -100,8 +100,8 @@ export default function ModelExport({ onClose }: ModelExportProps) {
           </fieldset>
 
           <fieldset className="space-y-3">
-            <legend className="uppercase text-xl font-light text-gray-600">Opsi</legend>
-            <label className="flex items-center gap-2 font-display text-sm font-bold text-gray-600">
+            <legend className="uppercase text-xl font-light text-on-surface-variant">Opsi</legend>
+            <label className="flex items-center gap-2 font-display text-sm font-bold text-on-surface-variant">
               <input
                 type="checkbox"
                 checked={transparent}
@@ -110,7 +110,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
               />
               Latar belakang transparan
             </label>
-            <label className="flex items-center gap-2 font-display text-sm font-bold text-gray-600">
+            <label className="flex items-center gap-2 font-display text-sm font-bold text-on-surface-variant">
               <input
                 type="checkbox"
                 checked={selectedOnly}
@@ -125,7 +125,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
 
           {format === 'png' && (
             <fieldset>
-              <legend className="mb-3 uppercase text-xl font-light text-gray-600">Skala gambar</legend>
+              <legend className="mb-3 uppercase text-xl font-light text-on-surface-variant">Skala gambar</legend>
               <div className="grid grid-cols-3 gap-3">
                 {SCALE_OPTIONS.map((option) => (
                   <button
@@ -133,7 +133,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                     type="button"
                     aria-pressed={scale === option}
                     onClick={() => setScale(option)}
-                    className={`border-4 border-black px-3 py-3 font-bold cursor-pointer ${scale === option ? 'bg-accent-peach' : 'bg-white'}`}
+                    className={`border-4 border-primary px-3 py-3 font-bold cursor-pointer ${scale === option ? 'bg-accent-peach text-primary' : 'bg-background text-primary'}`}
                   >
                     {option}x{option === 2 ? ' (HD)' : ''}
                   </button>
@@ -142,17 +142,17 @@ export default function ModelExport({ onClose }: ModelExportProps) {
             </fieldset>
           )}
 
-          <p className="font-mono text-xs text-gray-600">
+          <p className="font-mono text-xs text-on-surface-variant">
             PNG diekspor dari seluruh board, termasuk objek di luar viewport. {exportElements.length} elemen akan diproses.
           </p>
-          {error && <p className="font-mono text-sm font-bold text-red-600" role="alert">{error}</p>}
+          {error && <p className="font-mono text-sm font-bold text-accent-red" role="alert">{error}</p>}
         </div>
 
         <div className="flex justify-end gap-3 px-5 py-5">
           <button
             type="button"
             onClick={onClose}
-            className="border-4 border-black bg-white px-5 py-3 font-display cursor-pointer"
+            className="border-4 border-primary bg-background px-5 py-3 font-display text-primary cursor-pointer"
           >
             Batal
           </button>
@@ -160,7 +160,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
             type="button"
             onClick={handleDownload}
             disabled={isExporting}
-            className="inline-flex items-center justify-center gap-2 border-4 border-black bg-accent-blue px-5 py-3 font-display text-white cursor-pointer disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 border-4 border-primary bg-accent-blue px-5 py-3 font-display text-white cursor-pointer disabled:cursor-wait disabled:opacity-60"
           >
             <Download aria-hidden="true" />
             {isExporting ? 'Memproses...' : 'Download'}
