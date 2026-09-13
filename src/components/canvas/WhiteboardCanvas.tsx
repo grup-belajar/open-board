@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
-import { getMatrixFromState, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
+import { getMatrixFromState, panByScroll, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
 import { getElementBounds, mergeBounds } from '../../lib/geometry';
 import { getVisibleElements } from '../../lib/viewportCulling';
 import type { CanvasElement } from '../../store/slices/canvasSlice';
@@ -150,9 +150,13 @@ export default function WhiteboardCanvas() {
 
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const { x, y } = getCanvasPoint(event.clientX, event.clientY);
-      const factor = Math.exp(-event.deltaY * (event.ctrlKey ? 0.004 : 0.0015));
-      matrixRef.current = zoomAtPoint(matrixRef.current, factor, x, y);
+      if (event.ctrlKey || event.metaKey) {
+        const { x, y } = getCanvasPoint(event.clientX, event.clientY);
+        const factor = Math.exp(-event.deltaY * 0.004);
+        matrixRef.current = zoomAtPoint(matrixRef.current, factor, x, y);
+      } else {
+        matrixRef.current = panByScroll(matrixRef.current, event.deltaX, event.deltaY);
+      }
       syncViewport();
       draw();
     };

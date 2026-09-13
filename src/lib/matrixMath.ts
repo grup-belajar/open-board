@@ -27,6 +27,18 @@ export function clampZoom(value: number): number {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
 }
 
+export function panByScroll(
+  matrix: Matrix2D,
+  deltaX: number,
+  deltaY: number
+): Matrix2D {
+  return {
+    ...matrix,
+    e: matrix.e - deltaX,
+    f: matrix.f - deltaY,
+  };
+}
+
 export function screenToWorld(
   mx: number,
   my: number,
