@@ -18,6 +18,20 @@ export function getElementBounds(el: CanvasElement): Bounds {
       maxY: Math.max(...ys),
     };
   }
+
+  if (el.type === 'text') {
+    const lines = (el.text ?? '').split('\n');
+    const fontSize = Math.max(12, el.strokeWidth * 6);
+    const widestLine = Math.max(0, ...lines.map((line) => line.length));
+
+    return {
+      minX: el.x,
+      minY: el.y,
+      maxX: el.x + widestLine * fontSize * 0.6,
+      maxY: el.y + lines.length * (fontSize + 4),
+    };
+  }
+
   return {
     minX: el.x,
     minY: el.y,

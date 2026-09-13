@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
@@ -11,6 +11,7 @@ import type { CanvasElement } from '../../store/slices/canvasSlice';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
 import useDrawingEngine from '../../hooks/useDrawingEngine';
+import CanvasTextComposer from '../tools/CanvasTextComposer';
 
 export default function WhiteboardCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,6 +22,7 @@ export default function WhiteboardCanvas() {
   const spaceRef = useRef(false);
   const panState = useRef({ active: false, startX: 0, startY: 0 });
   const draftRef = useRef<CanvasElement | null>(null);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   const dispatch = useAppDispatch();
   const elements = useAppSelector((state) => state.canvas.elements);
@@ -117,6 +119,11 @@ export default function WhiteboardCanvas() {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = container.clientWidth * dpr;
       canvas.height = container.clientHeight * dpr;
+      setViewportSize((size) =>
+        size.width === container.clientWidth && size.height === container.clientHeight
+          ? size
+          : { width: container.clientWidth, height: container.clientHeight }
+      );
       draw();
     };
     resize();
@@ -204,7 +211,7 @@ export default function WhiteboardCanvas() {
     };
   }, [draw, getCanvasPoint, syncViewport]);
 
-  useDrawingEngine({
+  const { textInputDraft, submitTextInput, cancelTextInput } = useDrawingEngine({
     canvasRef,
     draftRef,
     getMatrix,
@@ -231,10 +238,12 @@ export default function WhiteboardCanvas() {
   });
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <div ref={containerRef} className="relative h-full w-full">
       <canvas
         ref={canvasRef}
-        className={`h-full w-full ${activeTool === 'pan' ? 'cursor-grab' : activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
+        tabIndex={0}
+        aria-label="Kanvas gambar OpenBoard. Pilih alat lalu klik untuk menambahkan objek."
+        className={`h-full w-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-accent-blue ${activeTool === 'pan' ? 'cursor-grab' : activeTool === 'select' ? 'cursor-default' : 'cursor-crosshair'}`}
         style={{
           touchAction: 'none',
           backgroundImage: 'radial-gradient(circle, var(--canvas-dot-color) 2px, transparent 2px)',
@@ -244,6 +253,14 @@ export default function WhiteboardCanvas() {
         }}
         data-testid="whiteboard-canvas"
       />
+      {textInputDraft && (
+        <CanvasTextComposer
+          draft={textInputDraft}
+          viewport={viewportSize}
+          onSubmit={submitTextInput}
+          onCancel={cancelTextInput}
+        />
+      )}
     </div>
   );
 }

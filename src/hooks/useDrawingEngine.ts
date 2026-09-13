@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addElement, deleteElement, setSelectedElementIds } from '../store/slices/canvasSlice';
 import type { CanvasElement } from '../store/slices/canvasSlice';
@@ -24,6 +24,19 @@ function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+export interface TextInputDraft {
+  type: 'text' | 'sticky';
+  x: number;
+  y: number;
+  screenX: number;
+  screenY: number;
+  strokeColor: string;
+  fillColor: string;
+  strokeWidth: number;
+  roughness: number;
+  initialText: string;
+}
+
 function roughnessForStyle(style: DrawingStyle): number {
   return style === 'clean' ? 0 : 1;
 }
@@ -41,6 +54,7 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
   const styleRef = useRef({ strokeColor, fillColor, strokeWidth, drawingStyle });
   const elementsRef = useRef(elements);
   const drawingRef = useRef(false);
+  const [textInputDraft, setTextInputDraft] = useState<TextInputDraft | null>(null);
 
   useEffect(() => {
     toolRef.current = activeTool;
@@ -79,46 +93,36 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
       }
 
       if (toolRef.current === 'text') {
-        const textVal = prompt('Masukkan teks:', 'Text');
-        if (textVal) {
-          dispatch(
-            addElement({
-              id: newId(),
-              type: 'text',
-              x: world.x,
-              y: world.y,
-              strokeColor: styleRef.current.strokeColor || '#000000',
-              fillColor: 'transparent',
-              strokeWidth: styleRef.current.strokeWidth || 2,
-              roughness: roughnessForStyle(styleRef.current.drawingStyle),
-              text: textVal,
-            })
-          );
-          redraw();
-        }
+        const style = styleRef.current;
+        setTextInputDraft({
+          type: 'text',
+          x: world.x,
+          y: world.y,
+          screenX: point.x,
+          screenY: point.y,
+          strokeColor: style.strokeColor || '#000000',
+          fillColor: 'transparent',
+          strokeWidth: style.strokeWidth || 2,
+          roughness: roughnessForStyle(style.drawingStyle),
+          initialText: 'Text',
+        });
         return;
       }
 
       if (toolRef.current === 'sticky') {
-        const textVal = prompt('Masukkan catatan:', 'Catatan baru');
-        if (textVal !== null) {
-          dispatch(
-            addElement({
-              id: newId(),
-              type: 'sticky',
-              x: world.x,
-              y: world.y,
-              width: 160,
-              height: 120,
-              strokeColor: styleRef.current.strokeColor || '#000000',
-              fillColor: styleRef.current.fillColor === 'transparent' ? '#fef08a' : styleRef.current.fillColor,
-              strokeWidth: styleRef.current.strokeWidth || 2,
-              roughness: roughnessForStyle(styleRef.current.drawingStyle),
-              text: textVal || 'Catatan',
-            })
-          );
-          redraw();
-        }
+        const style = styleRef.current;
+        setTextInputDraft({
+          type: 'sticky',
+          x: world.x,
+          y: world.y,
+          screenX: point.x,
+          screenY: point.y,
+          strokeColor: style.strokeColor || '#000000',
+          fillColor: style.fillColor === 'transparent' ? '#fef08a' : style.fillColor,
+          strokeWidth: style.strokeWidth || 2,
+          roughness: roughnessForStyle(style.drawingStyle),
+          initialText: 'Catatan baru',
+        });
         return;
       }
 
@@ -221,4 +225,38 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
       canvas.removeEventListener('pointerup', onPointerUp);
     };
   }, [canvasRef, onPointerDown, onPointerMove, onPointerUp]);
+
+  const cancelTextInput = useCallback(() => {
+    setTextInputDraft(null);
+    canvasRef.current?.focus();
+  }, [canvasRef]);
+
+  const submitTextInput = useCallback((value: string) => {
+    const input = textInputDraft;
+    const text = value.trimEnd();
+
+    if (!input || (input.type === 'text' && !text.trim())) {
+      setTextInputDraft(null);
+      canvasRef.current?.focus();
+      return;
+    }
+
+    dispatch(addElement({
+      id: newId(),
+      type: input.type,
+      x: input.x,
+      y: input.y,
+      ...(input.type === 'sticky' ? { width: 160, height: 120 } : {}),
+      strokeColor: input.strokeColor,
+      fillColor: input.fillColor,
+      strokeWidth: input.strokeWidth,
+      roughness: input.roughness,
+      text: text.trim() ? text : 'Catatan',
+    }));
+    setTextInputDraft(null);
+    canvasRef.current?.focus();
+    redraw();
+  }, [canvasRef, dispatch, redraw, textInputDraft]);
+
+  return { textInputDraft, submitTextInput, cancelTextInput };
 }
