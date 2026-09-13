@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, FolderOpen, Clock, Trash2, Edit2, Trash } from 'lucide-react';
 import Navbar from '../components/ui/Navbar';
@@ -184,7 +185,7 @@ export default function HomePage() {
         </section>
 
         {/* Recent Boards */}
-        <section className="bg-surface-2 px-6 py-20 md:px-10">
+        <section id="recent-boards" className="bg-surface-2 px-6 py-20 md:px-10">
           <div className="mx-auto max-w-6xl">
             <div className="mb-12 flex flex-col items-end justify-between gap-6 md:flex-row">
               <div>
@@ -247,16 +248,18 @@ export default function HomePage() {
                           <button
                             type="button"
                             onClick={() => router.push(`/board/${board.id}`)}
+                            aria-label={`Buka ${board.name}`}
                             className="border-2 border-primary p-1.5 hover:bg-accent-blue hover:text-white transition-colors"
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <Edit2 className="h-4 w-4" aria-hidden="true" />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteBoard(board.id)}
+                            aria-label={`Hapus ${board.name}`}
                             className="border-2 border-primary p-1.5 hover:bg-accent-pink hover:text-white transition-colors"
                           >
-                            <Trash className="h-4 w-4" />
+                            <Trash className="h-4 w-4" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
@@ -294,12 +297,12 @@ export default function HomePage() {
             >
               Kontribusi di GitHub
             </a>
-            <button
-              type="button"
-              className="border-4 border-accent-blue bg-accent-blue px-8 py-4 font-display text-xl font-black uppercase text-white transition-all hover:bg-background hover:text-accent-blue"
+            <Link
+              href="#recent-boards"
+              className="border-4 border-accent-blue bg-accent-blue px-8 py-4 font-display text-xl font-black uppercase text-white transition-all hover:bg-background hover:text-accent-blue focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue"
             >
-              Join Community
-            </button>
+              Lihat papan terakhir
+            </Link>
           </div>
         </section>
       </main>
@@ -312,11 +315,17 @@ export default function HomePage() {
             <p className="font-mono text-label-sm text-on-primary/60">© 2026 OpenBoard · Neobrutalism Edition</p>
           </div>
           <div className="flex flex-wrap gap-8">
-            {['Privacy', 'Terms', 'Discord', 'Github'].map((item) => (
-              <a key={item} href="#" className="font-mono text-label-sm text-on-primary/70 transition-colors hover:text-accent-blue">
-                {item}
-              </a>
-            ))}
+            <Link href="#recent-boards" className="font-mono text-label-sm text-on-primary/80 transition-colors hover:text-accent-blue focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue">
+              Papan terakhir
+            </Link>
+            <a
+              href="https://github.com/grup-belajar/open-board"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-label-sm text-on-primary/80 transition-colors hover:text-accent-blue focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </footer>
