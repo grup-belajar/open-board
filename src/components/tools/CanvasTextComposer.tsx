@@ -98,17 +98,17 @@ export default function CanvasTextComposer({ draft, viewport, onSubmit, onCancel
         Ctrl+Enter untuk menambahkan · Escape untuk membatalkan
       </p>
 
-      <div className="mt-auto flex justify-end gap-2">
+      <div className="mt-auto flex justify-end gap-1">
         <button
           type="button"
           onClick={onCancel}
-          className="border-2 border-primary bg-background px-3 py-2 font-mono text-label-sm font-bold text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
+          className="border-2 border-primary bg-background px-2 py-2 font-mono text-label-sm font-bold text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
         >
           Batal
         </button>
         <button
           type="submit"
-          className="border-2 border-primary bg-accent-blue px-3 py-2 font-mono text-label-sm font-bold text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
+          className="border-2 border-primary bg-accent-blue px-2 py-2 font-mono text-label-sm font-bold text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
         >
           Tambahkan
         </button>
