@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Menu, Plus, X } from 'lucide-react';
@@ -35,8 +36,15 @@ export default function Navbar() {
       <Link
         href="/"
         onClick={() => setIsMobileMenuOpen(false)}
-        className="font-display text-2xl font-extrabold uppercase tracking-tighter text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue md:text-display md:font-black"
+        className="inline-flex items-center gap-2 font-display text-2xl font-extrabold uppercase tracking-tighter text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue md:text-display md:font-black"
       >
+        <Image
+          src="/openboard-mark.svg"
+          alt=""
+          width={48}
+          height={48}
+          className="h-7 w-7 shrink-0 md:h-12 md:w-12"
+        />
         OpenBoard
       </Link>
 

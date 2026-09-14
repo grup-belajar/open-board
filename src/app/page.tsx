@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, FolderOpen, Clock, Trash2, Edit2, Trash } from 'lucide-react';
@@ -311,7 +312,10 @@ export default function HomePage() {
       <footer className="border-t-4 border-primary bg-primary">
         <div className="flex flex-col items-center justify-between gap-8 px-6 py-8 md:flex-row md:px-10">
           <div className="flex flex-col gap-1">
-            <h2 className="font-display text-2xl font-extrabold uppercase text-on-primary">OpenBoard</h2>
+            <h2 className="flex items-center gap-2 font-display text-2xl font-extrabold uppercase text-on-primary">
+              <Image src="/openboard-mark.svg" alt="" width={28} height={28} className="h-7 w-7 shrink-0" />
+              OpenBoard
+            </h2>
             <p className="font-mono text-label-sm text-on-primary/60">© 2026 OpenBoard · Neobrutalism Edition</p>
           </div>
           <div className="flex flex-wrap gap-8">

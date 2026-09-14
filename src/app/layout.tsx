@@ -25,6 +25,9 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: 'OpenBoard',
   description: 'Whiteboard digital offline-first dengan gaya hand-drawn. Gratis, tanpa login, langsung eksekusi.',
+  icons: {
+    icon: '/openboard-mark.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
