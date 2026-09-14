@@ -84,8 +84,14 @@ export default function WhiteboardCanvas() {
   }, [draw]);
 
   useEffect(() => () => {
-    if (scheduledDrawRef.current !== null) cancelAnimationFrame(scheduledDrawRef.current);
-    if (scheduledViewportSyncRef.current !== null) cancelAnimationFrame(scheduledViewportSyncRef.current);
+    if (scheduledDrawRef.current !== null) {
+      cancelAnimationFrame(scheduledDrawRef.current);
+      scheduledDrawRef.current = null;
+    }
+    if (scheduledViewportSyncRef.current !== null) {
+      cancelAnimationFrame(scheduledViewportSyncRef.current);
+      scheduledViewportSyncRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
