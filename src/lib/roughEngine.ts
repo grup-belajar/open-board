@@ -1,5 +1,6 @@
 import rough from 'roughjs';
 import type { RoughCanvas } from 'roughjs/bin/canvas';
+import type { Drawable } from 'roughjs/bin/core';
 import type { CanvasElement } from '../store/slices/canvasSlice';
 
 export type RoughOptions = {
@@ -8,6 +9,8 @@ export type RoughOptions = {
   strokeWidth: number;
   roughness: number;
 };
+
+const drawableCache = new WeakMap<RoughCanvas, WeakMap<CanvasElement, Drawable>>();
 
 export function createRoughRenderer(canvas: HTMLCanvasElement): RoughCanvas {
   return rough.canvas(canvas);
@@ -71,37 +74,87 @@ export function drawLine(
 export function drawElement(
   roughCanvas: RoughCanvas,
   ctx: CanvasRenderingContext2D,
-  el: CanvasElement
+  el: CanvasElement,
+  shouldCache = true
 ): void {
+  if (el.type === 'text') {
+    drawText(ctx, el);
+    return;
+  }
+
+  if (el.type === 'sticky') {
+    drawSticky(roughCanvas, ctx, el, shouldCache);
+    return;
+  }
+
+  const drawable = shouldCache ? getDrawable(roughCanvas, el) : createDrawable(roughCanvas, el);
+  if (drawable) roughCanvas.draw(drawable);
+}
+
+function getDrawable(roughCanvas: RoughCanvas, el: CanvasElement): Drawable | null {
+  let elementCache = drawableCache.get(roughCanvas);
+  if (!elementCache) {
+    elementCache = new WeakMap<CanvasElement, Drawable>();
+    drawableCache.set(roughCanvas, elementCache);
+  }
+
+  const cached = elementCache.get(el);
+  if (cached) return cached;
+
+  const drawable = createDrawable(roughCanvas, el);
+  if (drawable) elementCache.set(el, drawable);
+  return drawable;
+}
+
+function createDrawable(roughCanvas: RoughCanvas, el: CanvasElement): Drawable | null {
   const options: RoughOptions = {
     strokeColor: el.strokeColor,
-    fillColor: el.fillColor,
+    fillColor: el.type === 'sticky' ? 'transparent' : el.fillColor,
     strokeWidth: el.strokeWidth,
     roughness: el.roughness,
   };
 
+  const generator = roughCanvas.generator;
+  let drawable: Drawable | null = null;
+
   switch (el.type) {
     case 'freehand':
-      if (el.points) drawFreehand(roughCanvas, el.points, options);
+      if (el.points) {
+        const path = el.points
+          .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+          .join(' ');
+        drawable = generator.path(path, toRoughOptions(options));
+      }
       break;
     case 'rectangle':
-      drawRectangle(roughCanvas, el.x, el.y, el.width ?? 0, el.height ?? 0, options);
+      drawable = generator.rectangle(el.x, el.y, el.width ?? 0, el.height ?? 0, toRoughOptions(options));
       break;
     case 'ellipse':
-      drawEllipse(roughCanvas, el.x, el.y, el.width ?? 0, el.height ?? 0, options);
+      drawable = generator.ellipse(
+        el.x + (el.width ?? 0) / 2,
+        el.y + (el.height ?? 0) / 2,
+        el.width ?? 0,
+        el.height ?? 0,
+        toRoughOptions(options)
+      );
       break;
     case 'line':
-      drawLine(roughCanvas, el.x, el.y, (el.width ?? 0) + el.x, (el.height ?? 0) + el.y, options);
-      break;
-    case 'text':
-      drawText(ctx, el);
+      drawable = generator.line(
+        el.x,
+        el.y,
+        (el.width ?? 0) + el.x,
+        (el.height ?? 0) + el.y,
+        toRoughOptions(options)
+      );
       break;
     case 'sticky':
-      drawSticky(roughCanvas, ctx, el);
+      drawable = generator.rectangle(el.x, el.y, el.width ?? 160, el.height ?? 120, toRoughOptions(options));
       break;
     default:
-      break;
+      return null;
   }
+
+  return drawable;
 }
 
 function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
@@ -116,7 +169,12 @@ function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
   ctx.restore();
 }
 
-function drawSticky(roughCanvas: RoughCanvas, ctx: CanvasRenderingContext2D, el: CanvasElement): void {
+function drawSticky(
+  roughCanvas: RoughCanvas,
+  ctx: CanvasRenderingContext2D,
+  el: CanvasElement,
+  shouldCache: boolean
+): void {
   ctx.save();
   const width = el.width ?? 160;
   const height = el.height ?? 120;
@@ -124,12 +182,8 @@ function drawSticky(roughCanvas: RoughCanvas, ctx: CanvasRenderingContext2D, el:
   ctx.fillStyle = el.fillColor === 'transparent' ? '#fef08a' : el.fillColor;
   ctx.fillRect(el.x, el.y, width, height);
 
-  roughCanvas.rectangle(el.x, el.y, width, height, {
-    stroke: el.strokeColor,
-    strokeWidth: el.strokeWidth,
-    roughness: el.roughness,
-    fill: 'none',
-  });
+  const drawable = shouldCache ? getDrawable(roughCanvas, el) : createDrawable(roughCanvas, el);
+  if (drawable) roughCanvas.draw(drawable);
 
   ctx.fillStyle = el.strokeColor;
   ctx.font = '14px Inter, sans-serif';

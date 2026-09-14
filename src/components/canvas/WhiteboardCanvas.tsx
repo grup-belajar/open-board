@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setPanZoom } from '../../store/slices/canvasSlice';
 import { createRoughRenderer, drawElement } from '../../lib/roughEngine';
+import { CanvasSceneCache } from '../../lib/canvasSceneCache';
 import { getMatrixFromState, panByScroll, worldToScreen, zoomAtPoint } from '../../lib/matrixMath';
 import { getElementBounds, mergeBounds } from '../../lib/geometry';
-import { getVisibleElements } from '../../lib/viewportCulling';
 import type { CanvasElement } from '../../store/slices/canvasSlice';
 import type { Matrix2D } from '../../lib/matrixMath';
 import useSelectionEngine from '../../hooks/useSelectionEngine';
@@ -18,10 +18,13 @@ export default function WhiteboardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const roughRef = useRef<ReturnType<typeof createRoughRenderer> | null>(null);
+  const sceneCacheRef = useRef<CanvasSceneCache | null>(null);
   const matrixRef = useRef<Matrix2D>(getMatrixFromState({ x: 0, y: 0 }, 1));
   const spaceRef = useRef(false);
   const panState = useRef({ active: false, startX: 0, startY: 0 });
   const draftRef = useRef<CanvasElement | null>(null);
+  const scheduledDrawRef = useRef<number | null>(null);
+  const scheduledViewportSyncRef = useRef<number | null>(null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   const dispatch = useAppDispatch();
@@ -36,8 +39,13 @@ export default function WhiteboardCanvas() {
   const activeToolRef = useRef(activeTool);
 
   const syncViewport = useCallback(() => {
-    const m = matrixRef.current;
-    dispatch(setPanZoom({ panOffset: { x: m.e, y: m.f }, zoomLevel: m.a }));
+    if (scheduledViewportSyncRef.current !== null) return;
+
+    scheduledViewportSyncRef.current = requestAnimationFrame(() => {
+      scheduledViewportSyncRef.current = null;
+      const matrix = matrixRef.current;
+      dispatch(setPanZoom({ panOffset: { x: matrix.e, y: matrix.f }, zoomLevel: matrix.a }));
+    });
   }, [dispatch]);
 
   const draw = useCallback(() => {
@@ -49,39 +57,46 @@ export default function WhiteboardCanvas() {
     const dpr = window.devicePixelRatio || 1;
     const m = matrixRef.current;
 
-    ctx.setTransform(dpr * m.a, dpr * m.b, dpr * m.c, dpr * m.d, dpr * m.e, dpr * m.f);
-    ctx.clearRect(
-      -m.e / m.a,
-      -m.f / m.d,
-      canvas.width / (dpr * m.a),
-      canvas.height / (dpr * m.d)
-    );
-
-    const visibleElements = getVisibleElements(
+    if (!sceneCacheRef.current) sceneCacheRef.current = new CanvasSceneCache();
+    sceneCacheRef.current.draw(
+      ctx,
       elementsRef.current,
+      m,
       { width: canvas.width / dpr, height: canvas.height / dpr },
-      m
+      dpr
     );
 
-    for (const el of visibleElements) {
-      drawElement(rough, ctx, el);
-    }
+    ctx.setTransform(dpr * m.a, dpr * m.b, dpr * m.c, dpr * m.d, dpr * m.e, dpr * m.f);
 
     const draft = draftRef.current;
-    if (draft) drawElement(rough, ctx, draft);
+    if (draft) drawElement(rough, ctx, draft, false);
 
     drawSelectionOverlay(ctx, elementsRef.current, selectionRef.current, m, dpr);
   }, []);
 
+  const scheduleDraw = useCallback(() => {
+    if (scheduledDrawRef.current !== null) return;
+
+    scheduledDrawRef.current = requestAnimationFrame(() => {
+      scheduledDrawRef.current = null;
+      draw();
+    });
+  }, [draw]);
+
+  useEffect(() => () => {
+    if (scheduledDrawRef.current !== null) cancelAnimationFrame(scheduledDrawRef.current);
+    if (scheduledViewportSyncRef.current !== null) cancelAnimationFrame(scheduledViewportSyncRef.current);
+  }, []);
+
   useEffect(() => {
     elementsRef.current = elements;
-    draw();
-  }, [elements, draw]);
+    scheduleDraw();
+  }, [elements, scheduleDraw]);
 
   useEffect(() => {
     selectionRef.current = selectedElementIds;
-    draw();
-  }, [selectedElementIds, draw]);
+    scheduleDraw();
+  }, [selectedElementIds, scheduleDraw]);
 
   useEffect(() => {
     activeToolRef.current = activeTool;
@@ -124,14 +139,14 @@ export default function WhiteboardCanvas() {
           ? size
           : { width: container.clientWidth, height: container.clientHeight }
       );
-      draw();
+      scheduleDraw();
     };
     resize();
 
     const observer = new ResizeObserver(resize);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [draw]);
+  }, [scheduleDraw]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -165,7 +180,7 @@ export default function WhiteboardCanvas() {
         matrixRef.current = panByScroll(matrixRef.current, event.deltaX, event.deltaY);
       }
       syncViewport();
-      draw();
+      scheduleDraw();
     };
 
     const onPointerDown = (event: PointerEvent) => {
@@ -185,7 +200,7 @@ export default function WhiteboardCanvas() {
       pan.startX = event.clientX;
       pan.startY = event.clientY;
       syncViewport();
-      draw();
+      scheduleDraw();
     };
 
     const onPointerUp = (event: PointerEvent) => {
@@ -209,13 +224,13 @@ export default function WhiteboardCanvas() {
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('contextmenu', onContextMenu);
     };
-  }, [draw, getCanvasPoint, syncViewport]);
+  }, [getCanvasPoint, scheduleDraw, syncViewport]);
 
   const { textInputDraft, submitTextInput, cancelTextInput } = useDrawingEngine({
     canvasRef,
     draftRef,
     getMatrix,
-    redraw: draw,
+    redraw: scheduleDraw,
     isPanGesture,
   });
 
@@ -232,7 +247,7 @@ export default function WhiteboardCanvas() {
   useSelectionEngine({
     canvasRef,
     getMatrix,
-    redraw: draw,
+    redraw: scheduleDraw,
     isPanGesture,
     enabled: selectionEnabled,
   });
