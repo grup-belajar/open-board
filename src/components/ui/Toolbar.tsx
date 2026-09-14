@@ -33,7 +33,7 @@ export default function Toolbar() {
   return (
     <nav
       aria-label="Canvas tools"
-      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 border-4 border-primary bg-background p-1.5 shadow-hard"
+      className="fixed bottom-6 left-1/2 z-50 flex w-max max-w-[calc(100vw-1rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-1 border-4 border-primary bg-background p-1.5 shadow-hard"
     >
       {TOOLS.map(({ type, label, icon: Icon }) => (
         <button
