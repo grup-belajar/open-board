@@ -8,6 +8,7 @@ import {
   setStrokeWidth,
   type DrawingStyle,
 } from '../../store/slices/toolSlice';
+import AutosaveStatus from '../ui/AutosaveStatus';
 
 const DRAWING_STYLE_STORAGE_KEY = 'openboard-drawing-style';
 
@@ -16,7 +17,11 @@ const DRAWING_STYLES: { value: DrawingStyle; label: string }[] = [
   { value: 'clean', label: 'Vektor' },
 ];
 
-export default function PropertyPanel() {
+interface PropertyPanelProps {
+  boardId: string;
+}
+
+export default function PropertyPanel({ boardId }: PropertyPanelProps) {
   const dispatch = useAppDispatch();
   const { strokeColor, strokeWidth, drawingStyle } = useAppSelector((state) => state.tool);
 
@@ -42,7 +47,10 @@ export default function PropertyPanel() {
   }
 
   return (
-    <aside className="fixed right-4 top-16 w-48 rounded-lg border border-primary bg-background p-3 shadow-lg">
+    <aside className="fixed right-4 top-32 max-h-[calc(100vh-9rem)] w-48 overflow-y-auto rounded-lg border border-primary bg-background p-3 shadow-lg md:top-24 md:max-h-[calc(100vh-7rem)]">
+      <div className="mb-3 border-b-2 border-primary pb-3">
+        <AutosaveStatus boardId={boardId} />
+      </div>
       <fieldset className="mb-3">
         <legend className="mb-1 block text-xs font-medium text-on-surface-variant">
           Gaya objek baru

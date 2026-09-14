@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import canvasReducer from './slices/canvasSlice';
+import autosaveReducer from './slices/autosaveSlice';
 import toolReducer from './slices/toolSlice';
 import { indexedDbSyncMiddleware } from './middleware/indexedDbSync';
 
 export const store = configureStore({
   reducer: {
+    autosave: autosaveReducer,
     canvas: canvasReducer,
     tool: toolReducer,
   },

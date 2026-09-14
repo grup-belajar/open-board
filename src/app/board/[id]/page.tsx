@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { loadBoard } from '../../../lib/db';
+import { loadBoardWithStatus } from '../../../lib/db';
 import { hydrateCanvas } from '../../../store/slices/canvasSlice';
+import { initializeAutosaveStatus } from '../../../store/slices/autosaveSlice';
 import { useAppDispatch } from '../../../store/hooks';
 import ButtonShorcut from '@/src/components/ui/button/buttonShorcut';
 import ModelExport from '@/src/components/ui/modal/ModelExport';
@@ -31,11 +32,16 @@ export default function BoardPage() {
 
     const hydrateBoard = async () => {
       try {
-        const board = await loadBoard(boardId);
+        const loadResult = await loadBoardWithStatus(boardId);
         if (cancelled) return;
 
         dispatch(hydrateCanvas({
-          elements: board?.elements ?? [],
+          elements: loadResult.board?.elements ?? [],
+        }));
+        dispatch(initializeAutosaveStatus({
+          boardId,
+          indexedDbConfirmed: loadResult.indexedDbConfirmed,
+          recoveryJournalAvailable: loadResult.recoveryJournalAvailable,
         }));
         setHydratedBoardId(boardId);
       } catch (error) {
@@ -83,7 +89,7 @@ export default function BoardPage() {
             <>
               <WhiteboardCanvas />
               <Toolbar />
-              <PropertyPanel />
+              <PropertyPanel boardId={boardId} />
             </>
           )}
         </div>

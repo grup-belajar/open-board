@@ -10,12 +10,30 @@ import {
   updateElement,
   updateElements,
 } from '../slices/canvasSlice';
+import {
+  beginAutosave,
+  completeAutosave,
+  failAutosave,
+  initializeAutosaveStatus,
+  retryAutosave,
+  updateAutosaveJournalStatus,
+} from '../slices/autosaveSlice';
 import { saveBoard, writeAutosaveJournal } from '../../lib/db';
 
 interface PendingSnapshot {
   elements: CanvasElement[];
+  requestId: number;
   timer: ReturnType<typeof setTimeout>;
 }
+
+type AutosaveStatusAction =
+  | ReturnType<typeof beginAutosave>
+  | ReturnType<typeof completeAutosave>
+  | ReturnType<typeof failAutosave>
+  | ReturnType<typeof initializeAutosaveStatus>
+  | ReturnType<typeof updateAutosaveJournalStatus>;
+
+type StatusDispatcher = (action: AutosaveStatusAction) => void;
 
 const AUTOSAVE_INTERVAL_MS = 2000;
 const AUTOSAVE_RETRY_DELAY_MS = 2000;
@@ -33,6 +51,15 @@ const IMMEDIATE_SAVE_ACTION_TYPES = new Set<string>([
 const previousSnapshots = new Map<string, string>();
 const pendingSnapshots = new Map<string, PendingSnapshot>();
 const saveQueues = new Map<string, Promise<void>>();
+const saveRequestIds = new Map<string, number>();
+
+const AUTOSAVE_STATUS_ACTION_TYPES = new Set<string>([
+  beginAutosave.type,
+  completeAutosave.type,
+  failAutosave.type,
+  initializeAutosaveStatus.type,
+  updateAutosaveJournalStatus.type,
+]);
 
 let lifecycleListenersInstalled = false;
 
@@ -43,13 +70,23 @@ function getCurrentBoardId(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function getNextSaveRequestId(boardId: string): number {
+  const requestId = (saveRequestIds.get(boardId) ?? 0) + 1;
+  saveRequestIds.set(boardId, requestId);
+  return requestId;
+}
+
 function persistSnapshot(
   boardId: string,
   elements: CanvasElement[],
+  requestId: number,
+  dispatchStatus: StatusDispatcher,
   retryAttempt = 0
 ): void {
   const snapshot = JSON.stringify(elements);
   const journalTimestamp = writeAutosaveJournal(boardId, elements);
+  const journalAvailable = journalTimestamp !== null;
+  dispatchStatus(updateAutosaveJournalStatus({ boardId, requestId, journalAvailable }));
   const previousSave = saveQueues.get(boardId) ?? Promise.resolve();
   const currentSave = previousSave.catch(() => undefined).then(async () => {
     await saveBoard(boardId, elements, undefined, journalTimestamp ?? undefined);
@@ -59,6 +96,7 @@ function persistSnapshot(
   void currentSave.then(
     () => {
       clearSaveQueue(boardId, currentSave);
+      dispatchStatus(completeAutosave({ boardId, requestId, journalAvailable }));
     },
     (error: unknown) => {
       clearSaveQueue(boardId, currentSave);
@@ -66,12 +104,13 @@ function persistSnapshot(
       if (retryAttempt < MAX_AUTOSAVE_RETRIES) {
         window.setTimeout(() => {
           if (previousSnapshots.get(boardId) === snapshot) {
-            persistSnapshot(boardId, elements, retryAttempt + 1);
+            persistSnapshot(boardId, elements, requestId, dispatchStatus, retryAttempt + 1);
           }
         }, AUTOSAVE_RETRY_DELAY_MS);
         return;
       }
 
+      dispatchStatus(failAutosave({ boardId, requestId, journalAvailable }));
       console.error(`[OpenBoard] Autosave board ${boardId} gagal:`, error);
     }
   );
@@ -83,32 +122,35 @@ function clearSaveQueue(boardId: string, completedSave: Promise<void>): void {
   }
 }
 
-function flushPendingSnapshot(boardId: string): void {
+function flushPendingSnapshot(boardId: string, dispatchStatus: StatusDispatcher): void {
   const pending = pendingSnapshots.get(boardId);
   if (!pending) return;
 
   clearTimeout(pending.timer);
   pendingSnapshots.delete(boardId);
-  persistSnapshot(boardId, pending.elements);
+  persistSnapshot(boardId, pending.elements, pending.requestId, dispatchStatus);
 }
 
-function flushAllPendingSnapshots(): void {
+function flushAllPendingSnapshots(dispatchStatus: StatusDispatcher): void {
   for (const boardId of pendingSnapshots.keys()) {
-    flushPendingSnapshot(boardId);
+    flushPendingSnapshot(boardId, dispatchStatus);
   }
 }
 
 function queueSnapshot(
   boardId: string,
   elements: CanvasElement[],
-  saveImmediately: boolean
+  saveImmediately: boolean,
+  dispatchStatus: StatusDispatcher
 ): void {
   const pending = pendingSnapshots.get(boardId);
 
   if (saveImmediately) {
     if (pending) clearTimeout(pending.timer);
     pendingSnapshots.delete(boardId);
-    persistSnapshot(boardId, elements);
+    const requestId = getNextSaveRequestId(boardId);
+    dispatchStatus(beginAutosave({ boardId, requestId, journalAvailable: null }));
+    persistSnapshot(boardId, elements, requestId, dispatchStatus);
     return;
   }
 
@@ -117,16 +159,21 @@ function queueSnapshot(
     return;
   }
 
-  const timer = setTimeout(() => flushPendingSnapshot(boardId), AUTOSAVE_INTERVAL_MS);
-  pendingSnapshots.set(boardId, { elements, timer });
+  const requestId = getNextSaveRequestId(boardId);
+  dispatchStatus(beginAutosave({ boardId, requestId, journalAvailable: null }));
+  const timer = setTimeout(
+    () => flushPendingSnapshot(boardId, dispatchStatus),
+    AUTOSAVE_INTERVAL_MS
+  );
+  pendingSnapshots.set(boardId, { elements, requestId, timer });
 }
 
-function installLifecycleListeners(): void {
+function installLifecycleListeners(dispatchStatus: StatusDispatcher): void {
   if (lifecycleListenersInstalled || typeof window === 'undefined') return;
 
-  window.addEventListener('pagehide', flushAllPendingSnapshots);
+  window.addEventListener('pagehide', () => flushAllPendingSnapshots(dispatchStatus));
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') flushAllPendingSnapshots();
+    if (document.visibilityState === 'hidden') flushAllPendingSnapshots(dispatchStatus);
   });
   lifecycleListenersInstalled = true;
 }
@@ -140,16 +187,37 @@ export const indexedDbSyncMiddleware: Middleware = (store) => (next) => (action)
   const result = next(action);
   if (typeof window === 'undefined') return result;
 
-  installLifecycleListeners();
+  const dispatchStatus: StatusDispatcher = (statusAction) => {
+    store.dispatch(statusAction);
+  };
+  installLifecycleListeners(dispatchStatus);
 
   const boardId = getCurrentBoardId();
   if (!boardId) return result;
 
   const actionType = getActionType(action);
-  if (actionType === hydrateCanvas.type) return result;
+  if (actionType === hydrateCanvas.type) {
+    const state = store.getState() as { canvas: { elements: CanvasElement[] } };
+    previousSnapshots.set(boardId, JSON.stringify(state.canvas.elements));
+    return result;
+  }
+
+  if (AUTOSAVE_STATUS_ACTION_TYPES.has(actionType)) return result;
+
+  if (actionType === retryAutosave.type) {
+    const requestedBoardId = (action as ReturnType<typeof retryAutosave>).payload.boardId;
+    if (requestedBoardId !== boardId) return result;
+
+    const state = store.getState() as { canvas: { elements: CanvasElement[] } };
+    const snapshot = JSON.stringify(state.canvas.elements);
+    previousSnapshots.set(boardId, snapshot);
+    const elements = JSON.parse(snapshot) as CanvasElement[];
+    queueSnapshot(boardId, elements, true, dispatchStatus);
+    return result;
+  }
 
   if (actionType === commitHistory.type) {
-    flushPendingSnapshot(boardId);
+    flushPendingSnapshot(boardId, dispatchStatus);
     return result;
   }
 
@@ -160,7 +228,12 @@ export const indexedDbSyncMiddleware: Middleware = (store) => (next) => (action)
   previousSnapshots.set(boardId, snapshot);
 
   const elementsToSave = JSON.parse(snapshot) as CanvasElement[];
-  queueSnapshot(boardId, elementsToSave, IMMEDIATE_SAVE_ACTION_TYPES.has(actionType));
+  queueSnapshot(
+    boardId,
+    elementsToSave,
+    IMMEDIATE_SAVE_ACTION_TYPES.has(actionType),
+    dispatchStatus
+  );
 
   return result;
 };

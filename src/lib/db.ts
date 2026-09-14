@@ -9,6 +9,18 @@ export interface BoardRecord {
   createdAt: number;
 }
 
+export interface BoardLoadResult {
+  board: BoardRecord | undefined;
+  indexedDbConfirmed: boolean;
+  recoveryJournalAvailable: boolean;
+}
+
+interface AutosaveRecoveryResult {
+  board: BoardRecord;
+  indexedDbConfirmed: boolean;
+  recoveryJournalAvailable: boolean;
+}
+
 interface AutosaveJournalRecord {
   boardId: string;
   elements: CanvasElement[];
@@ -189,10 +201,14 @@ function clearAllAutosaveJournals(): void {
 async function recoverAutosaveJournal(
   journal: AutosaveJournalRecord,
   existing?: BoardRecord
-): Promise<BoardRecord> {
+): Promise<AutosaveRecoveryResult> {
   if (existing && journal.updatedAt < existing.updatedAt) {
     clearAutosaveJournal(journal.boardId, journal.updatedAt);
-    return existing;
+    return {
+      board: existing,
+      indexedDbConfirmed: true,
+      recoveryJournalAvailable: false,
+    };
   }
 
   const recovered: BoardRecord = {
@@ -203,16 +219,30 @@ async function recoverAutosaveJournal(
     updatedAt: journal.updatedAt,
   };
 
-  if (!db) return recovered;
+  if (!db) {
+    return {
+      board: recovered,
+      indexedDbConfirmed: false,
+      recoveryJournalAvailable: true,
+    };
+  }
 
   try {
     await db.boards.put(recovered);
     clearAutosaveJournal(journal.boardId, journal.updatedAt);
+    return {
+      board: recovered,
+      indexedDbConfirmed: true,
+      recoveryJournalAvailable: false,
+    };
   } catch (error) {
     console.error(`[OpenBoard] Recovery board ${journal.boardId} gagal:`, error);
+    return {
+      board: recovered,
+      indexedDbConfirmed: false,
+      recoveryJournalAvailable: true,
+    };
   }
-
-  return recovered;
 }
 
 /**
@@ -225,7 +255,7 @@ export async function saveBoard(
   name?: string,
   journalTimestamp?: number
 ): Promise<void> {
-  if (!db) return;
+  if (!db) throw new Error('IndexedDB tidak tersedia di browser ini.');
   const existing = await db.boards.get(id);
   const currentJournal = journalTimestamp === undefined
     ? undefined
@@ -253,13 +283,29 @@ export async function saveBoard(
 }
 
 export async function loadBoard(id: string): Promise<BoardRecord | undefined> {
-  if (!db) return undefined;
-  const [existing, journal] = await Promise.all([
-    db.boards.get(id),
-    Promise.resolve(readAutosaveJournal(id)),
-  ]);
+  const result = await loadBoardWithStatus(id);
+  return result.board;
+}
 
-  if (!journal) return existing;
+export async function loadBoardWithStatus(id: string): Promise<BoardLoadResult> {
+  if (!db) {
+    return {
+      board: undefined,
+      indexedDbConfirmed: false,
+      recoveryJournalAvailable: false,
+    };
+  }
+
+  const journal = readAutosaveJournal(id);
+  const existing = await db.boards.get(id);
+  if (!journal) {
+    return {
+      board: existing,
+      indexedDbConfirmed: existing !== undefined,
+      recoveryJournalAvailable: false,
+    };
+  }
+
   return recoverAutosaveJournal(journal, existing);
 }
 
@@ -269,8 +315,8 @@ export async function getAllBoards(): Promise<BoardRecord[]> {
   const boards = new Map((await db.boards.toArray()).map((board) => [board.id, board]));
 
   for (const journal of readAllAutosaveJournals()) {
-    const recovered = await recoverAutosaveJournal(journal, boards.get(journal.boardId));
-    boards.set(recovered.id, recovered);
+    const recovery = await recoverAutosaveJournal(journal, boards.get(journal.boardId));
+    boards.set(recovery.board.id, recovery.board);
   }
 
   return Array.from(boards.values()).sort((a, b) => b.updatedAt - a.updatedAt);
