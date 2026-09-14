@@ -88,7 +88,7 @@ Proyek ini dikerjakan oleh **3 orang pengembang**. Setiap pengembang memiliki ba
 | :--- | :--- | :--- |
 | **Performa Rendering** | FPS Kanvas saat Pengeditan | $\ge 60\text{ FPS}$ (hingga 1.000 objek aktif) |
 | **Pengalaman Pengguna** | Waktu Muat hingga Coretan Pertama | $< 3\text{ detik}$ |
-| **Handal & Stabil** | Autosave Reliability | $0\%$ kehilangan data saat browser ditutup mendadak |
+| **Handal & Stabil** | Autosave Reliability | Transaksi IndexedDB yang berhasil menjadi titik simpan utama. Snapshot pemulihan ditulis sinkron ke `localStorage` sebelum transaksi dan dipulihkan saat board atau daftar board dibuka, jika browser mengizinkannya. Data yang belum terkonfirmasi dapat hilang jika browser, storage, atau sistem berhenti sebelum penyimpanan selesai. Tidak ada jaminan nol kehilangan data saat hard crash atau listrik padam. |
 
 ---
 
@@ -111,7 +111,7 @@ Proyek ini dikerjakan oleh **3 orang pengembang**. Setiap pengembang memiliki ba
                                                               │
                                                 ┌─────────────┴─────────────┐
                                                 ▼                           ▼
-                                    [ Autosave 2 Detik ]        [ Klik "Simpan/Ekspor" ]
+                                    [ Autosave + Recovery ]     [ Klik "Simpan/Ekspor" ]
                                                 │                           │
                                     Redux Middleware Sync       Ekspor ke PNG / SVG / JSON
                                     ke Dexie.js (IndexedDB)     via exportEngine.ts
@@ -161,7 +161,7 @@ Proyek ini dikerjakan oleh **3 orang pengembang**. Setiap pengembang memiliki ba
 * **[FE-02.2] Undo / Redo History:** Redux Toolkit mengelola tumpukan riwayat (*history stack*) untuk menangani `Ctrl+Z` (Undo) dan `Ctrl+Y` / `Ctrl+Shift+Z` (Redo).
 
 ### 6.3 Persistence & Export (Modul Orang 3)
-* **[FE-03.1] Redux-IndexedDB Autosave:** State dari `canvasSlice` disinkronkan ke Dexie.js secara otomatis tiap 2 detik jika ada perubahan.
+* **[FE-03.1] Redux-IndexedDB Autosave:** Aksi canvas yang selesai memicu penyimpanan ke IndexedDB. Perubahan selama manipulasi objek digabungkan dan disimpan maksimal tiap 2 detik, lalu di-flush saat interaksi selesai atau halaman disembunyikan. Sebelum transaksi IndexedDB dimulai, aplikasi menulis snapshot pemulihan secara sinkron ke `localStorage` jika browser mengizinkannya. Saat board atau daftar board dibuka, snapshot yang lebih baru dipulihkan ke IndexedDB. Workspace menampilkan status Menyimpan, Tersimpan, atau Gagal menyimpan; kegagalan IndexedDB dapat dicoba ulang dari UI, sedangkan kegagalan journal ditampilkan sebagai peringatan. Transaksi IndexedDB yang berhasil menjadi titik simpan utama. Journal pemulihan bergantung pada kapasitas dan dukungan browser, sehingga perubahan yang belum terkonfirmasi masih dapat hilang jika proses browser atau sistem berhenti sebelum penyimpanan selesai.
 * **[FE-03.2] Multi-Format Export:** Mengonversi data Redux/Canvas menjadi file download PNG (skala 1x, 2x, 3x), SVG Vektor, atau JSON backup.
 
 ---

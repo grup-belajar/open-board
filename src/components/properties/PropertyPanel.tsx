@@ -1,15 +1,79 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { setStrokeColor, setStrokeWidth } from '../../store/slices/toolSlice';
+import {
+  setDrawingStyle,
+  setStrokeColor,
+  setStrokeWidth,
+  type DrawingStyle,
+} from '../../store/slices/toolSlice';
+import AutosaveStatus from '../ui/AutosaveStatus';
 
-export default function PropertyPanel() {
+const DRAWING_STYLE_STORAGE_KEY = 'openboard-drawing-style';
+
+const DRAWING_STYLES: { value: DrawingStyle; label: string }[] = [
+  { value: 'sketchy', label: 'Sketsa' },
+  { value: 'clean', label: 'Vektor' },
+];
+
+interface PropertyPanelProps {
+  boardId: string;
+}
+
+export default function PropertyPanel({ boardId }: PropertyPanelProps) {
   const dispatch = useAppDispatch();
-  const { strokeColor, strokeWidth } = useAppSelector((state) => state.tool);
+  const { strokeColor, strokeWidth, drawingStyle } = useAppSelector((state) => state.tool);
+
+  useLayoutEffect(() => {
+    try {
+      const savedStyle = window.localStorage.getItem(DRAWING_STYLE_STORAGE_KEY);
+      if ((savedStyle === 'sketchy' || savedStyle === 'clean') && savedStyle !== drawingStyle) {
+        dispatch(setDrawingStyle(savedStyle));
+      }
+    } catch {
+      // The default drawing style remains available when storage is blocked.
+    }
+  }, [dispatch, drawingStyle]);
+
+  function selectDrawingStyle(style: DrawingStyle): void {
+    dispatch(setDrawingStyle(style));
+
+    try {
+      window.localStorage.setItem(DRAWING_STYLE_STORAGE_KEY, style);
+    } catch {
+      // The selected style still applies to new elements on this page.
+    }
+  }
 
   return (
-    <aside className="fixed right-4 top-16 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-      <label className="mb-1 block text-xs font-medium text-gray-500">
+    <aside className="fixed right-4 top-32 max-h-[calc(100vh-9rem)] w-48 overflow-y-auto rounded-lg border border-primary bg-background p-3 shadow-lg md:top-24 md:max-h-[calc(100vh-7rem)]">
+      <div className="mb-3 border-b-2 border-primary pb-3">
+        <AutosaveStatus boardId={boardId} />
+      </div>
+      <fieldset className="mb-3">
+        <legend className="mb-1 block text-xs font-medium text-on-surface-variant">
+          Gaya objek baru
+        </legend>
+        <div className="grid grid-cols-2 gap-1">
+          {DRAWING_STYLES.map((style) => (
+            <button
+              key={style.value}
+              type="button"
+              aria-pressed={drawingStyle === style.value}
+              onClick={() => selectDrawingStyle(style.value)}
+              className={`border-2 border-primary px-2 py-1.5 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary ${
+                drawingStyle === style.value
+                  ? 'bg-accent-blue text-white'
+                  : 'bg-background text-primary hover:bg-surface-2'
+              }`}
+            >
+              {style.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <label className="mb-1 block text-xs font-medium text-on-surface-variant">
         Warna
       </label>
       <input
@@ -18,7 +82,7 @@ export default function PropertyPanel() {
         onChange={(e) => dispatch(setStrokeColor(e.target.value))}
         className="mb-3 h-8 w-full cursor-pointer"
       />
-      <label className="mb-1 block text-xs font-medium text-gray-500">
+      <label className="mb-1 block text-xs font-medium text-on-surface-variant">
         Ukuran Stroke: {strokeWidth}px
       </label>
       <input
