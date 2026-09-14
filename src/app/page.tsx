@@ -186,7 +186,7 @@ export default function HomePage() {
 
         {/* Recent Boards */}
         <section id="recent-boards" className="bg-surface-2 px-6 py-20 md:px-10">
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-7xl">
             <div className="mb-12 flex flex-col items-end justify-between gap-6 md:flex-row">
               <div>
                 <h3 className="font-display text-4xl font-black uppercase tracking-tighter text-primary md:text-5xl">
@@ -281,8 +281,8 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="border-y-4 border-primary bg-primary px-6 py-24 text-center text-on-primary">
-          <h2 className="mb-8 font-display text-5xl font-black uppercase leading-none tracking-tighter md:text-6xl">
+        <section className="border-y-4 border-on-primary bg-primary px-6 py-24 text-center text-on-primary">
+          <h2 className="mb-8 font-display text-4xl font-black uppercase leading-none tracking-tighter md:text-6xl">
             Bawa ide anda ke level selanjutnya
           </h2>
           <p className="mx-auto mb-12 max-w-2xl font-body text-body-lg opacity-80">
