@@ -124,16 +124,16 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden border-b-4 border-primary px-6 py-20 md:px-10">
-          <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
+          <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center text-center">
             <div className="-rotate-2 mb-6 inline-block border-2 border-primary bg-accent-blue px-4 py-1 font-mono text-label font-bold text-white">
               BETA 1.0 AVAILABLE NOW
             </div>
 
-            <h2 className="mb-6 font-display text-5xl font-black uppercase leading-none tracking-tighter text-primary md:text-7xl">
+            <h2 className="mb-6 font-display text-4xl font-black uppercase tracking-tight text-primary md:text-7xl">
               Papan Tulis Digital Bebas
             </h2>
 
-            <p className="mb-12 inline-block max-w-xl border-2 border-primary bg-background/90 p-4 font-body text-body-lg text-on-surface">
+            <p className="mb-12 inline-block max-w-2xl border-2 border-primary bg-background/90 p-4 font-body text-body-lg text-on-surface md:text-2xl">
               Coret-coret ide, buat diagram, gratis! Tanpa login, langsung eksekusi.
             </p>
 
@@ -141,7 +141,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleCreateBoard}
-                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-accent-blue px-10 py-5 font-display text-2xl font-black uppercase text-white shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none"
+                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-accent-blue px-10 py-6 font-display text-xl font-black uppercase text-white shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none md:text-2xl"
               >
                 <Plus className="h-6 w-6 stroke-[3]" />
                 + Buat Papan Baru
@@ -150,7 +150,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleOpenJsonClick}
-                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-background px-10 py-5 font-display text-2xl font-black uppercase text-primary shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none"
+                className="inline-flex items-center justify-center gap-3 border-4 border-primary bg-background px-10 py-6 font-display text-xl font-black uppercase text-primary shadow-hard transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-lg active:translate-x-2 active:translate-y-2 active:shadow-none md:text-2xl"
               >
                 <FolderOpen className="h-6 w-6 stroke-[3]" />
                 Buka File JSON
@@ -189,10 +189,10 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 flex flex-col items-end justify-between gap-6 md:flex-row">
               <div>
-                <h3 className="font-display text-4xl font-black uppercase tracking-tighter text-primary md:text-5xl">
+                <h3 className="mb-2 font-display text-3xl font-black uppercase tracking-tighter text-primary md:text-5xl">
                   Papan Terakhir Kamu
                 </h3>
-                <p className="font-mono text-label text-on-surface-variant">(Tersimpan Lokal di Browser)</p>
+                <p className="font-mono text-label font-bold text-on-surface-variant">(Tersimpan Lokal di Browser)</p>
               </div>
               <button
                 type="button"
@@ -285,7 +285,7 @@ export default function HomePage() {
           <h2 className="mb-8 font-display text-4xl font-black uppercase leading-none tracking-tighter md:text-6xl">
             Bawa ide anda ke level selanjutnya
           </h2>
-          <p className="mx-auto mb-12 max-w-2xl font-body text-body-lg opacity-80">
+          <p className="mx-auto mb-12 max-w-2xl font-body text-xl opacity-80">
             OpenBoard adalah alat open-source gratis untuk kolaborasi visual cepat. Tanpa akun, tanpa biaya tersembunyi.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
@@ -311,7 +311,7 @@ export default function HomePage() {
       <footer className="border-t-4 border-primary bg-primary">
         <div className="flex flex-col items-center justify-between gap-8 px-6 py-8 md:flex-row md:px-10">
           <div className="flex flex-col gap-1">
-            <h2 className="font-display text-headline font-black uppercase text-on-primary">OpenBoard</h2>
+            <h2 className="font-display text-2xl font-extrabold uppercase text-on-primary">OpenBoard</h2>
             <p className="font-mono text-label-sm text-on-primary/60">© 2026 OpenBoard · Neobrutalism Edition</p>
           </div>
           <div className="flex flex-wrap gap-8">

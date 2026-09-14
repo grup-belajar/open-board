@@ -35,7 +35,7 @@ export default function Navbar() {
       <Link
         href="/"
         onClick={() => setIsMobileMenuOpen(false)}
-        className="font-display text-headline uppercase tracking-tighter text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue"
+        className="font-display text-2xl font-extrabold uppercase tracking-tighter text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue md:text-display md:font-black"
       >
         OpenBoard
       </Link>
@@ -44,7 +44,7 @@ export default function Navbar() {
         <Link href="/" className="font-mono text-label font-bold text-secondary underline underline-offset-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue">
           Home
         </Link>
-        <Link href="/#recent-boards" className="font-mono text-label text-on-surface transition-colors hover:text-secondary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue">
+        <Link href="/#recent-boards" className="font-mono text-label font-bold text-on-surface transition-colors hover:text-secondary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent-blue">
           Explore
         </Link>
 
