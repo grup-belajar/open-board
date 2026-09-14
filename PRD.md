@@ -103,7 +103,7 @@ Proyek ini dikerjakan oleh **3 orang pengembang**. Setiap pengembang memiliki ba
 
 ### 4.3 Persistence & Export (Modul Orang 3)
 
-- **[FE-03.1] Redux-IndexedDB Autosave:** State dari `canvasSlice` disinkronkan ke Dexie.js secara otomatis tiap 2 detik jika ada perubahan.
+- **[FE-03.1] Redux-IndexedDB Autosave:** Aksi canvas yang selesai memicu penyimpanan ke IndexedDB. Perubahan selama manipulasi objek digabungkan dan disimpan maksimal tiap 2 detik, lalu di-flush saat interaksi selesai atau halaman disembunyikan. Sebelum transaksi IndexedDB dimulai, aplikasi menulis snapshot pemulihan secara sinkron ke `localStorage` jika browser mengizinkannya. Saat board atau daftar board dibuka, snapshot yang lebih baru dipulihkan ke IndexedDB. Transaksi IndexedDB yang berhasil menjadi titik simpan utama; journal pemulihan bergantung pada kapasitas dan dukungan browser. Perubahan yang belum terkonfirmasi masih dapat hilang jika proses browser atau sistem berhenti sebelum penyimpanan selesai.
 - **[FE-03.2] Multi-Format Export:** Mengonversi data Redux/Canvas menjadi file download PNG (skala 1x, 2x, 3x), SVG Vektor, atau JSON backup.
 
 ---

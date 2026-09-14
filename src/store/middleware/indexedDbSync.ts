@@ -10,7 +10,7 @@ import {
   updateElement,
   updateElements,
 } from '../slices/canvasSlice';
-import { loadBoard, saveBoard } from '../../lib/db';
+import { saveBoard, writeAutosaveJournal } from '../../lib/db';
 
 interface PendingSnapshot {
   elements: CanvasElement[];
@@ -49,10 +49,10 @@ function persistSnapshot(
   retryAttempt = 0
 ): void {
   const snapshot = JSON.stringify(elements);
+  const journalTimestamp = writeAutosaveJournal(boardId, elements);
   const previousSave = saveQueues.get(boardId) ?? Promise.resolve();
   const currentSave = previousSave.catch(() => undefined).then(async () => {
-    const existing = await loadBoard(boardId);
-    await saveBoard(boardId, elements, existing?.name ?? 'Untitled Board');
+    await saveBoard(boardId, elements, undefined, journalTimestamp ?? undefined);
   });
 
   saveQueues.set(boardId, currentSave);
