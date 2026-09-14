@@ -250,6 +250,7 @@ export default function useDrawingEngine({ canvasRef, draftRef, getMatrix, redra
       strokeColor: input.strokeColor,
       fillColor: input.fillColor,
       strokeWidth: input.strokeWidth,
+      ...(input.type === 'text' ? { fontSize: Math.max(12, input.strokeWidth * 6) } : {}),
       roughness: input.roughness,
       text: text.trim() ? text : 'Catatan',
     }));

@@ -9,6 +9,10 @@ export interface Bounds {
 
 const boundsCache = new WeakMap<CanvasElement, Bounds>();
 
+export function getTextFontSize(el: CanvasElement): number {
+  return el.fontSize ?? Math.max(12, el.strokeWidth * 6);
+}
+
 export function getElementBounds(el: CanvasElement): Bounds {
   const cached = boundsCache.get(el);
   if (cached) return cached;
@@ -32,7 +36,7 @@ export function getElementBounds(el: CanvasElement): Bounds {
     }
   } else if (el.type === 'text') {
     const lines = (el.text ?? '').split('\n');
-    const fontSize = Math.max(12, el.strokeWidth * 6);
+    const fontSize = getTextFontSize(el);
     const widestLine = Math.max(0, ...lines.map((line) => line.length));
 
     bounds = {

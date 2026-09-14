@@ -6,9 +6,10 @@ import { commitHistory, setElements, setSelectedElementIds } from '../store/slic
 import type { CanvasElement } from '../store/slices/canvasSlice';
 import type { Matrix2D } from '../lib/matrixMath';
 import { screenToWorld, worldToScreen } from '../lib/matrixMath';
-import { getElementBounds, hitTest, mergeBounds } from '../lib/geometry';
+import { getElementBounds, getTextFontSize, hitTest, mergeBounds } from '../lib/geometry';
 
 const RESIZE_HIT_SLOP = 8;
+const MIN_TEXT_FONT_SIZE = 8;
 
 type ResizeCorner = 'nw' | 'ne' | 'se' | 'sw';
 type InteractionMode = 'idle' | 'moving' | 'resizing';
@@ -183,6 +184,19 @@ export default function useSelectionEngine({ canvasRef, getMatrix, redraw, isPan
         const nMinY = newMinY + ry * (newMaxY - newMinY);
         const nMaxX = newMinX + rw * (newMaxX - newMinX);
         const nMaxY = newMinY + rh * (newMaxY - newMinY);
+
+        if (el.type === 'text') {
+          const scaleX = (newMaxX - newMinX) / oldW;
+          const scaleY = (newMaxY - newMinY) / oldH;
+          const fontScale = Math.sqrt(scaleX * scaleY);
+
+          return {
+            ...el,
+            x: nMinX,
+            y: nMinY,
+            fontSize: Math.max(MIN_TEXT_FONT_SIZE, getTextFontSize(el) * fontScale),
+          };
+        }
 
         if (el.type === 'line') {
           return {

@@ -1,6 +1,7 @@
 import type { CanvasElement } from '../store/slices/canvasSlice';
 import type { BoardRecord } from './db';
 import { createRoughRenderer, drawElement } from './roughEngine';
+import { getTextFontSize } from './geometry';
 
 export type PngScale = 1 | 2 | 3;
 
@@ -141,7 +142,7 @@ function getElementBounds(element: CanvasElement): Bounds {
   }
 
   if (element.type === 'text') {
-    const fontSize = Math.max(12, element.strokeWidth * 6);
+    const fontSize = getTextFontSize(element);
     const lines = (element.text ?? '').split('\n');
     const longestLine = Math.max(...lines.map((line) => line.length), 0);
     return {
@@ -215,7 +216,7 @@ function elementToSvgNode(element: CanvasElement): string {
       return `<polyline points="${points}" stroke="${stroke}" stroke-width="${strokeWidth}" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
     }
     case 'text':
-      return `<text x="${element.x}" y="${element.y}" fill="${stroke}" font-family="sans-serif" font-size="${Math.max(12, strokeWidth * 6)}">${escapeXml(element.text ?? '')}</text>`;
+      return `<text x="${element.x}" y="${element.y}" fill="${stroke}" font-family="sans-serif" font-size="${getTextFontSize(element)}">${escapeXml(element.text ?? '')}</text>`;
     case 'sticky': {
       const width = element.width ?? 160;
       const height = element.height ?? 120;

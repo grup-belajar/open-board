@@ -2,6 +2,7 @@ import rough from 'roughjs';
 import type { RoughCanvas } from 'roughjs/bin/canvas';
 import type { Drawable } from 'roughjs/bin/core';
 import type { CanvasElement } from '../store/slices/canvasSlice';
+import { getTextFontSize } from './geometry';
 
 export type RoughOptions = {
   strokeColor: string;
@@ -159,7 +160,7 @@ function createDrawable(roughCanvas: RoughCanvas, el: CanvasElement): Drawable |
 
 function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
   ctx.save();
-  const fontSize = Math.max(12, el.strokeWidth * 6);
+  const fontSize = getTextFontSize(el);
   ctx.font = `${fontSize}px Inter, sans-serif`;
   ctx.fillStyle = el.strokeColor;
   ctx.textBaseline = 'top';

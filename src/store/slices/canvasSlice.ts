@@ -12,6 +12,7 @@ export interface CanvasElement {
   strokeColor: string;
   fillColor: string;
   strokeWidth: number;
+  fontSize?: number;
   roughness: number;
   text?: string;
 }
