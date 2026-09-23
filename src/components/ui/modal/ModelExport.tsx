@@ -1,7 +1,7 @@
 'use client';
 
 import { Download, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../../../store/hooks';
 import {
   exportElementsToPng,
@@ -23,8 +23,21 @@ const FORMAT_OPTIONS: { value: ExportFormat; label: string }[] = [
 ];
 
 const SCALE_OPTIONS: PngScale[] = [1, 2, 3];
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'area[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[contenteditable="true"]',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 export default function ModelExport({ onClose }: ModelExportProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   const elements = useAppSelector((state) => state.canvas.elements);
   const selectedElementIds = useAppSelector((state) => state.canvas.selectedElementIds);
   const [format, setFormat] = useState<ExportFormat>('png');
@@ -37,6 +50,47 @@ export default function ModelExport({ onClose }: ModelExportProps) {
   const exportElements = selectedOnly
     ? elements.filter((element) => selectedElementIds.includes(element.id))
     : elements;
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    closeButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (!focusableElements || focusableElements.length === 0) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocusRef.current?.focus();
+    };
+  }, [onClose]);
+
+  function handleBackdropMouseDown(event: React.MouseEvent<HTMLDivElement>): void {
+    if (event.target === event.currentTarget) onClose();
+  }
 
   const handleDownload = async () => {
     setIsExporting(true);
@@ -60,11 +114,17 @@ export default function ModelExport({ onClose }: ModelExportProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4" role="presentation">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
+      role="presentation"
+      onMouseDown={handleBackdropMouseDown}
+    >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="export-title"
+        aria-describedby="export-description"
         className="max-h-[90vh] w-full max-w-xl overflow-y-auto border-4 border-primary bg-background shadow-hard-lg"
       >
         <div className="flex items-center justify-between border-b-4 border-primary bg-accent-pink px-5 py-4">
@@ -72,9 +132,10 @@ export default function ModelExport({ onClose }: ModelExportProps) {
             Export &amp; Simpan Papan
           </h2>
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="border-2 border-primary bg-background p-1 cursor-pointer"
+            className="cursor-pointer border-2 border-primary bg-background p-1 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
             aria-label="Tutup modal export"
           >
             <X aria-hidden="true" />
@@ -91,7 +152,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                   type="button"
                   aria-pressed={format === option.value}
                   onClick={() => setFormat(option.value)}
-                  className={`border-4 border-primary px-3 py-3 font-bold cursor-pointer ${format === option.value ? 'bg-accent-blue text-white' : 'bg-background text-primary'}`}
+                  className={`cursor-pointer border-4 border-primary px-3 py-3 font-bold focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue ${format === option.value ? 'bg-accent-blue text-white' : 'bg-background text-primary'}`}
                 >
                   {option.label}
                 </button>
@@ -106,7 +167,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                 type="checkbox"
                 checked={transparent}
                 onChange={(event) => setTransparent(event.target.checked)}
-                className="h-5 w-5 cursor-pointer accent-blue-600"
+                className="h-5 w-5 cursor-pointer accent-blue-600 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
               />
               Latar belakang transparan
             </label>
@@ -116,7 +177,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                 checked={selectedOnly}
                 disabled={selectedElementIds.length === 0}
                 onChange={(event) => setSelectedOnly(event.target.checked)}
-                className="h-5 w-5 cursor-pointer accent-blue-600 disabled:cursor-not-allowed"
+                className="h-5 w-5 cursor-pointer accent-blue-600 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue disabled:cursor-not-allowed"
               />
               Hanya elemen terpilih
               {selectedElementIds.length === 0 && <span className="font-normal">(belum ada pilihan)</span>}
@@ -133,7 +194,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
                     type="button"
                     aria-pressed={scale === option}
                     onClick={() => setScale(option)}
-                    className={`border-4 border-primary px-3 py-3 font-bold cursor-pointer ${scale === option ? 'bg-accent-peach text-primary' : 'bg-background text-primary'}`}
+                    className={`cursor-pointer border-4 border-primary px-3 py-3 font-bold focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue ${scale === option ? 'bg-accent-peach text-primary' : 'bg-background text-primary'}`}
                   >
                     {option}x{option === 2 ? ' (HD)' : ''}
                   </button>
@@ -142,7 +203,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
             </fieldset>
           )}
 
-          <p className="font-mono text-xs text-on-surface-variant">
+          <p id="export-description" className="font-mono text-xs text-on-surface-variant">
             PNG diekspor dari seluruh board, termasuk objek di luar viewport. {exportElements.length} elemen akan diproses.
           </p>
           {error && <p className="font-mono text-sm font-bold text-accent-red" role="alert">{error}</p>}
@@ -152,7 +213,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
           <button
             type="button"
             onClick={onClose}
-            className="border-4 border-primary bg-background px-5 py-3 font-display text-primary cursor-pointer"
+            className="cursor-pointer border-4 border-primary bg-background px-5 py-3 font-display text-primary focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
           >
             Batal
           </button>
@@ -160,7 +221,7 @@ export default function ModelExport({ onClose }: ModelExportProps) {
             type="button"
             onClick={handleDownload}
             disabled={isExporting}
-            className="inline-flex items-center justify-center gap-2 border-4 border-primary bg-accent-blue px-5 py-3 font-display text-white cursor-pointer disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 border-4 border-primary bg-accent-blue px-5 py-3 font-display text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue disabled:cursor-wait disabled:opacity-60"
           >
             <Download aria-hidden="true" />
             {isExporting ? 'Memproses...' : 'Download'}

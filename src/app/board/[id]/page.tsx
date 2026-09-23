@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { loadBoardWithStatus } from '../../../lib/db';
 import { hydrateCanvas } from '../../../store/slices/canvasSlice';
@@ -24,6 +24,7 @@ export default function BoardPage() {
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [hydratedBoardId, setHydratedBoardId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<{ boardId: string; message: string } | null>(null);
+  const closeExport = useCallback(() => setIsExportOpen(false), []);
 
   useKeyboardShortcuts();
 
@@ -97,7 +98,7 @@ export default function BoardPage() {
         {!isHydrating && <ButtonShorcut onOpenExport={() => setIsExportOpen(true)} />}
       </div>
       <FooterBoardPage />
-      {!isHydrating && isExportOpen && <ModelExport onClose={() => setIsExportOpen(false)} />}
+      {!isHydrating && isExportOpen && <ModelExport onClose={closeExport} />}
     </>
   );
 }
