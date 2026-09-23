@@ -161,7 +161,7 @@ function createDrawable(roughCanvas: RoughCanvas, el: CanvasElement): Drawable |
 function drawText(ctx: CanvasRenderingContext2D, el: CanvasElement): void {
   ctx.save();
   const fontSize = getTextFontSize(el);
-  ctx.font = `${fontSize}px Inter, sans-serif`;
+  ctx.font = `${fontSize}px ${getCanvasFontFamily('--font-body', 'Inter, sans-serif')}`;
   ctx.fillStyle = el.strokeColor;
   ctx.textBaseline = 'top';
   (el.text ?? '').split('\n').forEach((line, i) => {
@@ -187,10 +187,20 @@ function drawSticky(
   if (drawable) roughCanvas.draw(drawable);
 
   ctx.fillStyle = el.strokeColor;
-  ctx.font = '14px Inter, sans-serif';
+  ctx.font = `14px ${getCanvasFontFamily('--font-body', 'Inter, sans-serif')}`;
   ctx.textBaseline = 'top';
   (el.text ?? '').split('\n').forEach((line, i) => {
     ctx.fillText(line, el.x + 8, el.y + 8 + i * 18);
   });
   ctx.restore();
+}
+
+function getCanvasFontFamily(variableName: string, fallback: string): string {
+  if (typeof document === 'undefined') return fallback;
+
+  const fontFamily = getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim();
+
+  return fontFamily || fallback;
 }

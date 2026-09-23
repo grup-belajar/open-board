@@ -89,7 +89,7 @@ export default function CanvasTextComposer({ draft, viewport, onSubmit, onCancel
         className="min-h-20 w-full resize-y border-2 border-primary bg-white/80 p-2 text-left text-on-surface focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent-blue"
         style={{
           color: draft.strokeColor,
-          fontFamily: 'Inter, sans-serif',
+          fontFamily: 'var(--font-body)',
           fontSize: isSticky ? 14 : Math.max(12, draft.strokeWidth * 6),
         }}
       />
